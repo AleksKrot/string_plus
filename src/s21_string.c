@@ -391,9 +391,13 @@ void s21_str_to_str(char *result, char *str, Flags *flags) {
 }
 
 void s21_ptr_to_str(char *result, void *ptr, Flags *flags) {
-  if (result != NULL && ptr != NULL) {
-    flags->sharp = true;
-    s21_uint_to_str(result, (long long int)&ptr, 16, flags);
+  if (result != NULL) {
+    if (ptr == NULL) {
+      s21_strncat(result, "(nil)", 5);
+    } else {
+      flags->sharp = true;
+      s21_uint_to_str(result, (long long int)ptr, 16, flags);
+    }
   }
 }
 
@@ -526,7 +530,7 @@ int s21_sprintf(char *str, const char *format, ...) {
         s21_g_float_to_str(str, va_arg(factor, double), &flags);
         break;
       case 'p':
-        // s21_ptr_to_str(str, va_arg(factor, int), &flags); // to-do void *
+        s21_ptr_to_str(str, va_arg(factor, void *), &flags);
         break;
       case 'n':
         int *n = va_arg(factor, int *);
