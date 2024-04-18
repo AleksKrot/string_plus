@@ -1,13 +1,15 @@
 #include "test.h"
 
 START_TEST(strncat_1) {
-
   char str1[50] = "This is a test string";
   char str1_copy[50] = "This is a test string";
   const char str2[] = "21";
 
-  s21_strncat(str1, str2, s21_strlen(str1) + 5);
-  strncat(str1_copy, str2, s21_strlen(str1) + 5);
+  char *res1 = s21_strncat(str1, str2, s21_strlen(str1) + 5);
+  char *res2 = strncat(str1_copy, str2, s21_strlen(str1) + 5);
+
+  ck_assert_ptr_eq(res1, str1);
+  ck_assert_ptr_eq(res2, str1_copy);
   ck_assert_str_eq(str1, str1_copy);
 }
 END_TEST
@@ -68,6 +70,7 @@ START_TEST(strncat_6) {
 
   s21_strncat(str1, str2, 8);
   strncat(str1_copy, str2, 8);
+
   ck_assert_str_eq(str1, str1_copy);
 }
 END_TEST
@@ -78,8 +81,8 @@ START_TEST(strncat_7) {
   char str1_copy[20] = "School\0 21";
   const char str2[] = "21";
 
-  s21_strncat(str1, str2, s21_strlen(str1));
-  strncat(str1_copy, str2, s21_strlen(str1));
+  s21_strncat(str1, str2, s21_strlen(str2));
+  strncat(str1_copy, str2, s21_strlen(str2));
   ck_assert_str_eq(str1, str1_copy);
 }
 END_TEST
