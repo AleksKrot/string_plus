@@ -4,7 +4,7 @@ CFILES= s21_string.c
 
 all: clean s21_string.a
 
-test: s21_string.a
+test: clean s21_string.a
 	gcc $(CFLAGS) ./test/*.c -o main -L. -l:s21_string.a $(TESTFLAGS)
 	./main
 
