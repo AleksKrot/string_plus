@@ -1,11 +1,12 @@
 #ifndef S21_STRING_H
 #define S21_STRING_H
 
-//#include <inttypes.h>
 #include <limits.h>
+#include <math.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #define is_flag(c)                                                             \
   ((c) == '-' || (c) == '+' || (c) == ' ' || (c) == '#' || (c) == '0')
@@ -19,6 +20,8 @@
    (c) == 'f' || (c) == 'g' || (c) == 'G' || (c) == 'o' || (c) == 's' ||       \
    (c) == 'u' || (c) == 'x' || (c) == 'X' || (c) == 'p' || (c) == 'n' ||       \
    (c) == '%')
+
+#define is_space(c) ((c) == ' ' || (c) == '\t' || (c) == '\n')
 
 typedef struct Flags {
   // flags
@@ -38,8 +41,17 @@ typedef struct Flags {
 
 } Flags;
 
+typedef struct SFlags {
+  bool prevent; //  *, помещенный после % и перед спецификатором формата,
+                //  считывает данные указанного типа, но подавляет их
+                //  присваивание.
+  int width; // максимальное количество читаемых символов
+  char size; // длина h, l, L
+} SFlags;
+
 // функция sprintf
 int s21_sprintf(char *str, const char *format, ...);
+int s21_sscanf(const char *str, const char *format, ...);
 
 // функции string.h
 void *s21_memchr(const void *str, int c, size_t n);
@@ -53,10 +65,6 @@ char *s21_strncpy(char *dest, const char *src, size_t n);
 
 size_t s21_strlen(const char *src);
 
-// специальные функции обработки строк
-void *to_upper(const char *str);
-void *to_lower(const char *str);
-
 // преобразование к строке
 void s21_int_to_str(char *result, long long int num, int num_sys, Flags *flags);
 void s21_uint_to_str(char *result, unsigned long long int num, int num_sys,
@@ -66,8 +74,10 @@ void s21_float_to_str(char *result, long double num, Flags *flags);
 void s21_notat_float_to_str(char *result, long double num, Flags *flags);
 void s21_g_float_to_str(char *result, float num, Flags *flags);
 
-void s21_char_to_str(char *result, char c);
+void s21_char_to_str(char **result, char c);
 void s21_str_to_str(char *result, char *str, Flags *flags);
 void s21_ptr_to_str(char *result, void *ptr, Flags *flags);
+
+int s21_sprintf_read_int(const char *str, int *i);
 
 #endif

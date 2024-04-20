@@ -1,6 +1,16 @@
 #include "s21_string.h"
-
 #include <stdarg.h>
+
+#define GET_ARG_INT                                                            \
+  (flags.size == 'l' ? va_arg(factor, long long int) : va_arg(factor, int))
+
+#define GET_ARG_UINT                                                           \
+  (flags.size == 'l' ? va_arg(factor, unsigned long long int)                  \
+                     : va_arg(factor, unsigned int))
+
+#define GET_ARG_FLOAT                                                          \
+  (flags.size == 'L' ? va_arg(factor, long double) : va_arg(factor, double))
+
 static void s21_zero_flags(Flags *flags) {
   s21_memset(flags, 0, sizeof(Flags));
   flags->accuracy = -1;
@@ -112,31 +122,15 @@ size_t s21_strlen(const char *src) {
 }
 
 // изменение регистра на заглавные буквы
-void *to_upper(const char *str) {
-  char *copy_str = (char *)str;
+static void s21_upper_str(char *str) {
   if (str != NULL) {
     size_t len = s21_strlen(str);
     for (size_t i = 0; i < len; i++) {
       if (str[i] >= 'a' && str[i] <= 'z') {
-        copy_str[i] = str[i] - 32;
+        str[i] = str[i] - 32;
       }
     }
   }
-  return copy_str;
-}
-
-// изменение регистра на строчные буквы
-void *to_lower(const char *str) {
-  char *copy_str = (char *)str;
-  if (str != NULL) {
-    size_t len = s21_strlen(str);
-    for (size_t i = 0; i < len; i++) {
-      if (str[i] >= 'A' && str[i] <= 'Z') {
-        copy_str[i] = str[i] + 32;
-      }
-    }
-  }
-  return copy_str;
 }
 
 static void s21_flags_int(char *result, char *str, char *prefix, Flags *flags) {
@@ -184,11 +178,11 @@ static void s21_flags_int(char *result, char *str, char *prefix, Flags *flags) {
       i++;                                                                     \
     }                                                                          \
     while (num != 0) {                                                         \
-      int rem_num = num % num_sys;                                             \
+      int rem_num = abs((int)(num % num_sys));                                 \
       if (rem_num < 10) {                                                      \
-        str[i] = (num % num_sys) + '0';                                        \
+        str[i] = rem_num + '0';                                                \
       } else {                                                                 \
-        str[i] = (num % num_sys) - 10 + 'a';                                   \
+        str[i] = rem_num - 10 + 'a';                                           \
       }                                                                        \
       num /= num_sys;                                                          \
       i++;                                                                     \
@@ -223,7 +217,6 @@ static void s21_flags_int(char *result, char *str, char *prefix, Flags *flags) {
 void s21_int_to_str(char *result, long long int num, int num_sys,
                     Flags *flags) {
   if (num < 0) {
-    num *= -1;
     flags->is_negative = true;
   }
   S21_ITS;
@@ -267,7 +260,7 @@ void s21_float_to_str(char *result, long double num, Flags *flags) {
     Flags int_flags;
     s21_zero_flags(&int_flags);
     char prefix[2] = "";
-    char float_str[10000] = ""; // ИЗМЕНИТЬ!!!
+    char float_str[10000] = "0";
     if (flags->sign && num >= 0) {
       s21_strncat(prefix, "+", 1);
     }
@@ -275,37 +268,52 @@ void s21_float_to_str(char *result, long double num, Flags *flags) {
       num *= -1;
       s21_strncat(prefix, "-", 1);
     }
-    long long int int_num = (int long long)num; // до точки
-    s21_int_to_str(float_str, int_num, 10, &int_flags);
-    s21_strncat(float_str, ".", 1);
-    long double rem = num - int_num; // после точки
-    int zero = 0; // подсчет количества нулей после .
+    int count_div = 0;
+    while (num >= 1.0) {
+      num /= 10;
+      count_div++;
+    }
+    if (count_div == 0) {
+      s21_strncat(float_str, "0", 1);
+    }
+    while (count_div > 0) {
+      num = (num - (int)num) * 10;
+      s21_int_to_str(float_str, (int)num, 10, &int_flags);
+      count_div--;
+    }
+    if (flags->sharp || flags->accuracy != 0) {
+      s21_strncat(float_str, ".", 1);
+    }
 
-    while (flags->accuracy > 0 && rem != 0.0) {
-      rem *= 10;
-      if (rem < 1.0) {
-        s21_strncat(float_str, "0", 1);
-        zero++;
-      }
+    while (flags->accuracy > 0) {
+      num = (num - (int)num) * 10;
+      s21_int_to_str(float_str, (int)num, 10, &int_flags);
       flags->accuracy--;
     }
-    long long int int_rem = (int long long)rem;
-    while (zero != 0) {
-      int_rem /= 10;
-      rem /= 10;
-      zero--;
-    }
-    long double round = rem - int_rem;
-    if (round >= 0.5) {
-      int_rem++;
-    }
-    s21_int_to_str(float_str, int_rem, 10, &int_flags);
-    if (int_rem == 0) {
-      for (int i = 0; i < flags->accuracy - 1; i++) {
-        s21_strncat(float_str, "0", 1);
+
+    int round = (int)((num - (int)num) * 10);
+
+    if (round >= 5) {
+      round = 1;
+      int pos = s21_strlen(float_str) - 1;
+      while (pos >= 0 && round != 0) {
+        if (float_str[pos] != '.') {
+          float_str[pos] += round;
+          if (float_str[pos] > '9') {
+            float_str[pos] = '0';
+            round = 1;
+          } else {
+            round = 0;
+          }
+        }
+        pos--;
       }
     }
-    s21_flags_float(result, float_str, prefix, flags);
+    if (float_str[0] == '1') {
+      s21_flags_float(result, float_str, prefix, flags);
+    } else {
+      s21_flags_float(result, float_str + 1, prefix, flags);
+    }
   }
 }
 
@@ -316,10 +324,11 @@ void s21_notat_float_to_str(char *result, long double num, Flags *flags) {
     char float_str[1000] = ""; // ИЗМЕНИТЬ !!!!
     if (flags->sign && num >= 0) {
       s21_strncat(prefix, "+", 1);
-    }
-    if (num < 0) {
+    } else if (num < 0) {
       num *= -1;
       s21_strncat(prefix, "-", 1);
+    } else if (flags->space) {
+      s21_strncat(prefix, " ", 1);
     }
     int exp = 0;
     if (num >= 1.0) {
@@ -328,7 +337,7 @@ void s21_notat_float_to_str(char *result, long double num, Flags *flags) {
         exp++;
       }
     } else {
-      while (num < 1.0) {
+      while (num < 1.0 && num != 0) {
         num *= 10;
         exp--;
       }
@@ -336,6 +345,7 @@ void s21_notat_float_to_str(char *result, long double num, Flags *flags) {
     Flags float_flags;
     s21_zero_flags(&float_flags);
     float_flags.accuracy = flags->accuracy;
+    float_flags.sharp = flags->sharp;
     s21_float_to_str(float_str, num, &float_flags);
     s21_strncat(float_str, "e", 1);
     if (exp < 0) {
@@ -357,35 +367,53 @@ void s21_notat_float_to_str(char *result, long double num, Flags *flags) {
 void s21_g_float_to_str(char *result, float num, Flags *flags) {
   if (result != NULL) {
     size_t len0 = s21_strlen(result);
-    s21_float_to_str(result, num, flags);
+    s21_notat_float_to_str(result, num, flags);
     size_t len1 = s21_strlen(result);
     result[len0] = '\0';
-    s21_notat_float_to_str(result, num, flags);
+    s21_float_to_str(result, num, flags);
     size_t len2 = s21_strlen(result);
     if (len1 < len2) {
       result[len0] = '\0';
-      s21_float_to_str(result, num, flags);
+      s21_notat_float_to_str(result, num, flags);
     }
   }
 }
 
 // для %c
-void s21_char_to_str(char *result, char c) {
-  if (result != NULL) {
+void s21_char_to_str(char **result, char c) {
+  if (*result != NULL) {
     char str[2] = "";
     str[0] = c;
     str[1] = '\0';
-    s21_strncat(result, str, 1);
+    s21_strncat(*result, str, 1);
+    if (c == '\0') {
+      *result += s21_strlen(*result) + 1;
+    }
   }
 }
 
 // для %s
 void s21_str_to_str(char *result, char *str, Flags *flags) {
   if (result != NULL && str != NULL) {
+    int count = (int)s21_strlen(str);
+    if (flags->accuracy >= 0) {
+      count = (int)s21_strlen(str) < flags->accuracy ? (int)s21_strlen(str)
+                                                     : flags->accuracy;
+    }
+    if ((int)flags->width > count && !flags->alignment) {
+      for (size_t i = 0; i < flags->width - count; i++) {
+        s21_strncat(result, " ", 1);
+      }
+    }
     if (flags->accuracy) {
       s21_strncat(result, str, flags->accuracy);
-    } else {
+    } else if (flags->accuracy != 0) {
       s21_strncat(result, str, s21_strlen(str));
+    }
+    if ((int)flags->width > count && flags->alignment) {
+      for (size_t i = 0; i < flags->width - count; i++) {
+        s21_strncat(result, " ", 1);
+      }
     }
   }
 }
@@ -396,6 +424,15 @@ void s21_ptr_to_str(char *result, void *ptr, Flags *flags) {
       s21_strncat(result, "(nil)", 5);
     } else {
       flags->sharp = true;
+      if (flags->sign) {
+        s21_strncat(result, "+", 1);
+        if (flags->width) {
+          flags->width--;
+        }
+      }
+      if (flags->accuracy) {
+        flags->accuracy += 2;
+      }
       s21_uint_to_str(result, (long long int)ptr, 16, flags);
     }
   }
@@ -427,124 +464,139 @@ static void s21_sprintf_flags(char c, Flags *flags) {
   }
 }
 
-static int s21_sprintf_read_int(const char *str, int *i) {
-  unsigned long long int ptr = 0;
-  while (is_digit(str[*i])) {
-    ptr *= 10;
-    ptr += str[*i] - '0';
+int s21_sprintf_read_int(const char *str, int *i) {
+  unsigned long long int ret_int = 0;
+  while (is_digit(str[*i]) && str[*i] != '\0') {
+    ret_int *= 10;
+    ret_int += str[*i] - '0';
     (*i)++;
-    if (ptr > INT_MAX) {
-      ptr = (unsigned long long int)INT_MAX + 1;
+    if (ret_int > INT_MAX) {
+      ret_int = (unsigned long long int)INT_MAX + 1;
     }
   }
-  if (ptr > INT_MAX) {
-    ptr = -1;
+  if (ret_int > INT_MAX) {
+    ret_int = -1;
   }
-  return ptr;
+  return ret_int;
 }
 
 int s21_sprintf(char *str, const char *format, ...) {
-  size_t len = s21_strlen(str);
-  va_list factor;           // указатель va_list
-  va_start(factor, format); // устанавливаем указатель
-  int i = 0;
-  int state = 0;
-  size_t len_str = s21_strlen(str);
-  Flags flags;
-  s21_zero_flags(&flags);
-  // %[флаги][ширина][.точность][длина]спецификатор.
-  while (format[i] != '\0') {
-    if (format[i] == '%') {
-      s21_zero_flags(&flags);
-      state = 1;
-    } else if (is_flag(format[i]) && state > 0) {
-      s21_sprintf_flags(format[i], &flags);
-    } else if ((is_digit(format[i]) || format[i] == '*') && state == 1) {
-      if (is_digit(format[i])) {
-        flags.width = s21_sprintf_read_int(format, &i);
-        i--;
-      } else {
-        flags.width = va_arg(factor, int);
+  size_t len = 0;
+  if (str != NULL && format != NULL) {
+    str[0] = '\0';
+    char *start_str = str;
+    va_list factor;           // указатель va_list
+    va_start(factor, format); // устанавливаем указатель
+    int i = 0;
+    int state = 0;
+    Flags flags;
+    int start_parse = 0; // нужно для обработки ошибки парсинга
+    s21_zero_flags(&flags);
+
+    // %[флаги][ширина][.точность][длина]спецификатор.
+    while (format[i] != '\0') {
+      if (format[i] == '%' && state == 0) {
+        s21_zero_flags(&flags);
+        start_parse = i;
+        state = 1;
+      } else if (is_flag(format[i]) && state > 0) {
+        s21_sprintf_flags(format[i], &flags);
+      } else if ((is_digit(format[i]) || format[i] == '*') && state == 1) {
+        if (is_digit(format[i])) {
+          flags.width = s21_sprintf_read_int(format, &i);
+          i--;
+        } else {
+          flags.width = va_arg(factor, int);
+        }
+        state = 2;
+      } else if (format[i] == '.' && state > 0 && state < 3) {
+        i++;
+        if (format[i] == '*') {
+          flags.accuracy = va_arg(factor, int);
+        } else {
+          flags.accuracy = s21_sprintf_read_int(format, &i);
+          i--;
+        }
+        state = 3;
+      } else if (is_length(format[i]) && state > 0 && state < 4) {
+        flags.size = format[i];
+        state = 4;
+      } else if (is_specifier(format[i]) && state > 0) {
+        if (s21_strchr("eEfgG", format[i]) && flags.accuracy == -1) {
+          flags.accuracy = 6;
+        }
+        char *ptr = str + s21_strlen(str);
+        switch (format[i]) {
+        case '%':
+          s21_char_to_str(&str, '%');
+          break;
+        case 'c':
+          s21_char_to_str(&str, va_arg(factor, int));
+          break;
+        case 's':
+          s21_str_to_str(str, va_arg(factor, char *), &flags);
+          break;
+        case 'd':
+        case 'i':
+          s21_int_to_str(str, GET_ARG_INT, 10, &flags);
+          break;
+        case 'o':
+          s21_uint_to_str(str, GET_ARG_UINT, 8, &flags);
+          break;
+        case 'X':
+          flags.is_up = true;
+          s21_uint_to_str(str, GET_ARG_UINT, 16, &flags);
+          break;
+        case 'x':
+          s21_uint_to_str(str, GET_ARG_UINT, 16, &flags);
+          break;
+        case 'u':
+          flags.sign = false;
+          s21_uint_to_str(str, GET_ARG_UINT, 10, &flags);
+          break;
+        case 'E':
+          flags.is_up = true;
+          s21_notat_float_to_str(str, GET_ARG_FLOAT, &flags);
+          break;
+        case 'e':
+          s21_notat_float_to_str(str, GET_ARG_FLOAT, &flags);
+          break;
+        case 'f':
+          s21_float_to_str(str, GET_ARG_FLOAT, &flags);
+          break;
+        case 'G':
+          flags.is_up = true;
+          s21_g_float_to_str(str, GET_ARG_FLOAT, &flags);
+          break;
+        case 'g':
+          s21_g_float_to_str(str, GET_ARG_FLOAT, &flags);
+          break;
+        case 'p':
+          s21_ptr_to_str(str, va_arg(factor, void *), &flags);
+          break;
+        case 'n':
+          int *n = va_arg(factor, int *);
+          if (n != NULL) {
+            *n = (int)(str - start_str + s21_strlen(str));
+          }
+          break;
+        }
+        if (flags.is_up) {
+          s21_upper_str(ptr);
+        }
+        state = 0;
+      } else if (state == 0) {
+        s21_strncat(str, &(format[i]), 1);
+      } else { // ошибка парсинга нужно вывести всё что было в строке
+        i = start_parse;
+        s21_strncat(str, &(format[i]), 1);
+        start_parse = 0;
+        state = 0;
       }
-      state = 2;
-    } else if (format[i] == '.' &&
-               (is_digit(format[i + 1]) || format[i + 1] == '*') && state > 0 &&
-               state < 3) {
       i++;
-      if (is_digit(format[i])) {
-        flags.accuracy = s21_sprintf_read_int(format, &i);
-        i--;
-      } else {
-        flags.accuracy = va_arg(factor, int);
-      }
-      state = 3;
-    } else if (is_length(format[i]) && state > 0 && state < 4) {
-      flags.size = format[i];
-      state = 4;
-    } else if (is_specifier(format[i]) && state > 0) {
-      if (s21_strchr("eEfgG", format[i]) && flags.accuracy == -1) {
-        flags.accuracy = 6;
-      }
-      switch (format[i]) {
-      case '%':
-        s21_char_to_str(str, '%');
-        break;
-      case 'c':
-        s21_char_to_str(str, va_arg(factor, int));
-        break;
-      case 's':
-        s21_str_to_str(str, va_arg(factor, char *), &flags);
-        break;
-      case 'd':
-      case 'i':
-        s21_int_to_str(str, va_arg(factor, int), 10, &flags);
-        break;
-      case 'o':
-        s21_int_to_str(str, va_arg(factor, unsigned int), 8, &flags);
-        break;
-      case 'X':
-        flags.is_up = true;
-        s21_int_to_str(str, va_arg(factor, unsigned int), 16, &flags);
-        break;
-      case 'x':
-        s21_int_to_str(str, va_arg(factor, unsigned int), 16, &flags);
-        break;
-      case 'u':
-        s21_int_to_str(str, va_arg(factor, unsigned int), 10, &flags);
-        break;
-      case 'E':
-        flags.is_up = true;
-        s21_notat_float_to_str(str, va_arg(factor, double), &flags);
-        break;
-      case 'e':
-        s21_notat_float_to_str(str, va_arg(factor, double), &flags);
-        break;
-      case 'f':
-        s21_float_to_str(str, va_arg(factor, double), &flags);
-        break;
-      case 'G':
-        flags.is_up = true;
-        s21_g_float_to_str(str, va_arg(factor, double), &flags);
-        break;
-      case 'g':
-        s21_g_float_to_str(str, va_arg(factor, double), &flags);
-        break;
-      case 'p':
-        s21_ptr_to_str(str, va_arg(factor, void *), &flags);
-        break;
-      case 'n':
-        int *n = va_arg(factor, int *);
-        *n = s21_strlen(str) - len_str;
-        break;
-      }
-      state = 0;
-    } else if (state == 0) {
-      s21_strncat(str, &(format[i]), 1);
-    } else {
-      state = 0;
     }
-    i++;
+    va_end(factor); // завершаем обработку параметров
+    len = str - start_str + s21_strlen(str);
   }
-  va_end(factor); // завершаем обработку параметров
-  return s21_strlen(str) - len;
+  return len;
 }
