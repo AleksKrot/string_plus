@@ -42,17 +42,8 @@ typedef struct Flags {
 
 } Flags;
 
-typedef struct SFlags {
-  bool prevent; //  *, помещенный после % и перед спецификатором формата,
-                //  считывает данные указанного типа, но подавляет их
-                //  присваивание.
-  int width; // максимальное количество читаемых символов
-  char size; // длина h, l, L
-} SFlags;
-
 // функция sprintf
 int s21_sprintf(char *str, const char *format, ...);
-int s21_sscanf(const char *str, const char *format, ...);
 
 // функции string.h
 void *s21_memchr(const void *str, int c, size_t n);
@@ -78,7 +69,5 @@ void s21_g_float_to_str(char *result, long double num, Flags *flags);
 void s21_char_to_str(char **result, char c);
 void s21_str_to_str(char *result, char *str, Flags *flags);
 void s21_ptr_to_str(char *result, void *ptr, Flags *flags);
-
-int s21_sprintf_read_int(const char *str, int *i);
 
 #endif

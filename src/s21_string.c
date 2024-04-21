@@ -256,7 +256,7 @@ static void s21_flags_float(char *result, char *str, char *prefix,
 }
 // для %f
 void s21_float_to_str(char *result, long double num, Flags flags) {
-  if (result != NULL) {
+  if (result != NULL && num != INFINITY && num != -INFINITY && !isnan(num)) {
     Flags int_flags;
     s21_zero_flags(&int_flags);
     char prefix[2] = "";
@@ -328,12 +328,19 @@ void s21_float_to_str(char *result, long double num, Flags flags) {
     } else {
       s21_flags_float(result, float_str + 1, prefix, &flags);
     }
+  } else if (result != NULL) {
+    if (num == INFINITY) {
+      s21_str_to_str(result, "inf", &flags);
+    } else if (num == -INFINITY) {
+      s21_str_to_str(result, "-inf", &flags);
+    } else if (isnan(num)) {
+      s21_str_to_str(result, "nan", &flags);
+    }
   }
 }
-
 // для %e и %E
 void s21_notat_float_to_str(char *result, long double num, Flags flags) {
-  if (result != NULL) {
+  if (result != NULL && num != INFINITY && num != -INFINITY && !isnan(num)) {
     char prefix[2] = "";
     char float_str[10000] = "";
     if (flags.sign && num >= 0) {
@@ -394,6 +401,14 @@ void s21_notat_float_to_str(char *result, long double num, Flags flags) {
     float_flags.accuracy = -1;
     s21_int_to_str(float_str, exp, 10, &float_flags);
     s21_flags_float(result, float_str, prefix, &flags);
+  } else if (result != NULL) {
+    if (num == INFINITY) {
+      s21_str_to_str(result, "inf", &flags);
+    } else if (num == -INFINITY) {
+      s21_str_to_str(result, "-inf", &flags);
+    } else if (isnan(num)) {
+      s21_str_to_str(result, "nan", &flags);
+    }
   }
 }
 
@@ -515,7 +530,7 @@ static void s21_sprintf_flags(char c, Flags *flags) {
   }
 }
 
-int s21_sprintf_read_int(const char *str, int *i) {
+static int s21_sprintf_read_int(const char *str, int *i) {
   unsigned long long int ret_int = 0;
   while (is_digit(str[*i]) && str[*i] != '\0') {
     ret_int *= 10;
@@ -541,14 +556,12 @@ int s21_sprintf(char *str, const char *format, ...) {
     int i = 0;
     int state = 0;
     Flags flags;
-    int start_parse = 0; // нужно для обработки ошибки парсинга
     s21_zero_flags(&flags);
 
     // %[флаги][ширина][.точность][длина]спецификатор.
     while (format[i] != '\0') {
       if (format[i] == '%' && state == 0) {
         s21_zero_flags(&flags);
-        start_parse = i;
         state = 1;
       } else if (is_flag(format[i]) && state > 0) {
         s21_sprintf_flags(format[i], &flags);
@@ -641,9 +654,27 @@ int s21_sprintf(char *str, const char *format, ...) {
       } else if (state == 0) {
         s21_strncat(str, &(format[i]), 1);
       } else { // ошибка парсинга нужно вывести всё что было в строке
-        i = start_parse;
-        s21_strncat(str, &(format[i]), 1);
-        start_parse = 0;
+        s21_strncat(str, "%", 1);
+        if (flags.sharp) {
+          s21_strncat(str, "#", 1);
+        }
+        if (flags.sign) {
+          s21_strncat(str, "+", 1);
+        }
+        if (flags.alignment) {
+          s21_strncat(str, "-", 1);
+        }
+        if (flags.width) {
+          Flags fl = {0};
+          s21_uint_to_str(str, flags.width, 10, &fl);
+        }
+        if (flags.accuracy) {
+          Flags fl = {0};
+          s21_strncat(str, ".", 1);
+          s21_uint_to_str(str, flags.accuracy, 10, &fl);
+        }
+        s21_strncat(str, format + i, 1);
+
         state = 0;
       }
       i++;

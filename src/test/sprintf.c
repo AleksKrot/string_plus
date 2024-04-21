@@ -1355,6 +1355,58 @@ START_TEST(sprintf_G_2) {
 }
 END_TEST
 
+START_TEST(sprintf_G_3) {
+  char str1[1024] = "";
+  char str2[1024] = "";
+  long double x = NAN;
+  char *format = "|%LG|\n";
+  int res1 = s21_sprintf(str1, format, x);
+  int res2 = sprintf(str2, format, x);
+
+  ck_assert_int_eq(res1, res2);
+  ck_assert_str_eq(str1, str2);
+}
+END_TEST
+
+START_TEST(sprintf_G_4) {
+  char str1[1024] = "";
+  char str2[1024] = "";
+  long double x = INFINITY;
+  char *format = "|%LG|\n";
+  int res1 = s21_sprintf(str1, format, x);
+  int res2 = sprintf(str2, format, x);
+
+  ck_assert_int_eq(res1, res2);
+  ck_assert_str_eq(str1, str2);
+}
+END_TEST
+
+START_TEST(sprintf_G_5) {
+  char str1[1024] = "";
+  char str2[1024] = "";
+  long double x = -INFINITY;
+  char *format = "|%+- #100.20LG|\n";
+  int res1 = s21_sprintf(str1, format, x);
+  int res2 = sprintf(str2, format, x);
+
+  ck_assert_int_eq(res1, res2);
+  ck_assert_str_eq(str1, str2);
+}
+END_TEST
+
+START_TEST(sprintf_parse_1) {
+  char str1[1024] = "";
+  char str2[1024] = "";
+  long double x = -INFINITY;
+  char *format = "|%+- #100.20,LG|\n";
+  int res1 = s21_sprintf(str1, format, x);
+  int res2 = sprintf(str2, format, x);
+
+  ck_assert_int_eq(res1, res2);
+  ck_assert_str_eq(str1, str2);
+}
+END_TEST
+
 Suite *s21_sprintf_d_suite(void) {
   Suite *suite = suite_create("int res1 = s21_sprintf_d_test");
   TCase *tcase_core = tcase_create("int res1 = s21_sprintf_d_test");
@@ -1463,6 +1515,10 @@ Suite *s21_sprintf_d_suite(void) {
   tcase_add_test(tcase_core, sprintf_g_7);
   tcase_add_test(tcase_core, sprintf_G_1);
   tcase_add_test(tcase_core, sprintf_G_2);
+  tcase_add_test(tcase_core, sprintf_G_3);
+  tcase_add_test(tcase_core, sprintf_G_4);
+  tcase_add_test(tcase_core, sprintf_G_5);
+  tcase_add_test(tcase_core, sprintf_parse_1);
   suite_add_tcase(suite, tcase_core);
   return suite;
 }
