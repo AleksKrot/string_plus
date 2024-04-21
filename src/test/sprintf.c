@@ -1108,6 +1108,19 @@ START_TEST(sprintf_e_8) {
 }
 END_TEST
 
+START_TEST(sprintf_e_9) {
+  char str1[1024] = "";
+  char str2[1024] = "";
+  double x = 9999999999;
+  char *format = "|%e|\n";
+  int res1 = s21_sprintf(str1, format, x);
+  int res2 = sprintf(str2, format, x);
+
+  ck_assert_int_eq(res1, res2);
+  ck_assert_str_eq(str1, str2);
+}
+END_TEST
+
 START_TEST(sprintf_Le_1) {
   char str1[1024] = "";
   char str2[1024] = "";
@@ -1229,7 +1242,111 @@ START_TEST(sprintf_g_1) {
   char str1[1024] = "";
   char str2[1024] = "";
   double x = 45456;
-  char *format = "|%30.8g|\n";
+  char *format = "|%-30.8g|\n";
+  int res1 = s21_sprintf(str1, format, x);
+  int res2 = sprintf(str2, format, x);
+
+  ck_assert_int_eq(res1, res2);
+  ck_assert_str_eq(str1, str2);
+}
+END_TEST
+
+START_TEST(sprintf_g_2) {
+  char str1[1024] = "";
+  char str2[1024] = "";
+  double x = 12345.340000;
+  char *format = "|%+#20.10g|\n";
+  int res1 = s21_sprintf(str1, format, x);
+  int res2 = sprintf(str2, format, x);
+
+  ck_assert_int_eq(res1, res2);
+  ck_assert_str_eq(str1, str2);
+}
+END_TEST
+
+START_TEST(sprintf_g_3) {
+  char str1[1024] = "";
+  char str2[1024] = "";
+  double x = 100000.1;
+  char *format = "|% 20.10g|\n";
+  int res1 = s21_sprintf(str1, format, x);
+  int res2 = sprintf(str2, format, x);
+
+  ck_assert_int_eq(res1, res2);
+  ck_assert_str_eq(str1, str2);
+}
+END_TEST
+
+START_TEST(sprintf_g_4) {
+  char str1[1024] = "";
+  char str2[1024] = "";
+  double x = 9999999.5;
+  char *format = "|%020.15g|\n";
+  int res1 = s21_sprintf(str1, format, x);
+  int res2 = sprintf(str2, format, x);
+
+  ck_assert_int_eq(res1, res2);
+  ck_assert_str_eq(str1, str2);
+}
+END_TEST
+
+START_TEST(sprintf_g_5) {
+  char str1[1024] = "";
+  char str2[1024] = "";
+  double x = 1.5;
+  char *format = "|%+20.0g|\n";
+  int res1 = s21_sprintf(str1, format, x);
+  int res2 = sprintf(str2, format, x);
+
+  ck_assert_int_eq(res1, res2);
+  ck_assert_str_eq(str1, str2);
+}
+END_TEST
+
+START_TEST(sprintf_g_6) {
+  char str1[1024] = "";
+  char str2[1024] = "";
+  double x = 100000.0;
+  char *format = "|%#.5g|\n";
+  int res1 = s21_sprintf(str1, format, x);
+  int res2 = sprintf(str2, format, x);
+
+  ck_assert_int_eq(res1, res2);
+  ck_assert_str_eq(str1, str2);
+}
+END_TEST
+
+START_TEST(sprintf_g_7) {
+  char str1[1024] = "";
+  char str2[1024] = "";
+  double x = 34253564577.0;
+  char *format = "|%g|\n";
+  int res1 = s21_sprintf(str1, format, x);
+  int res2 = sprintf(str2, format, x);
+
+  ck_assert_int_eq(res1, res2);
+  ck_assert_str_eq(str1, str2);
+}
+END_TEST
+
+START_TEST(sprintf_G_1) {
+  char str1[1024] = "";
+  char str2[1024] = "";
+  double x = 0.1242353635;
+  char *format = "|%G|\n";
+  int res1 = s21_sprintf(str1, format, x);
+  int res2 = sprintf(str2, format, x);
+
+  ck_assert_int_eq(res1, res2);
+  ck_assert_str_eq(str1, str2);
+}
+END_TEST
+
+START_TEST(sprintf_G_2) {
+  char str1[1024] = "";
+  char str2[1024] = "";
+  double x = 1352465.5454;
+  char *format = "|%G|\n";
   int res1 = s21_sprintf(str1, format, x);
   int res2 = sprintf(str2, format, x);
 
@@ -1327,6 +1444,7 @@ Suite *s21_sprintf_d_suite(void) {
   tcase_add_test(tcase_core, sprintf_e_6);
   tcase_add_test(tcase_core, sprintf_e_7);
   tcase_add_test(tcase_core, sprintf_e_8);
+  tcase_add_test(tcase_core, sprintf_e_9);
   tcase_add_test(tcase_core, sprintf_Le_1);
   tcase_add_test(tcase_core, sprintf_Le_2);
   tcase_add_test(tcase_core, sprintf_Le_3);
@@ -1337,7 +1455,14 @@ Suite *s21_sprintf_d_suite(void) {
   tcase_add_test(tcase_core, sprintf_LE_3);
   tcase_add_test(tcase_core, sprintf_LE_4);
   tcase_add_test(tcase_core, sprintf_g_1);
-
+  tcase_add_test(tcase_core, sprintf_g_2);
+  tcase_add_test(tcase_core, sprintf_g_3);
+  tcase_add_test(tcase_core, sprintf_g_4);
+  tcase_add_test(tcase_core, sprintf_g_5);
+  tcase_add_test(tcase_core, sprintf_g_6);
+  tcase_add_test(tcase_core, sprintf_g_7);
+  tcase_add_test(tcase_core, sprintf_G_1);
+  tcase_add_test(tcase_core, sprintf_G_2);
   suite_add_tcase(suite, tcase_core);
   return suite;
 }
