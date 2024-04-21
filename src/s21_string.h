@@ -38,6 +38,7 @@ typedef struct Flags {
   int accuracy; // точность для double, ширина для int
 
   char size; // длина h, l, L
+  bool is_g;
 
 } Flags;
 
@@ -70,9 +71,9 @@ void s21_int_to_str(char *result, long long int num, int num_sys, Flags *flags);
 void s21_uint_to_str(char *result, unsigned long long int num, int num_sys,
                      Flags *flags);
 
-void s21_float_to_str(char *result, long double num, Flags *flags);
-void s21_notat_float_to_str(char *result, long double num, Flags *flags);
-void s21_g_float_to_str(char *result, float num, Flags *flags);
+void s21_float_to_str(char *result, long double num, Flags flags);
+void s21_notat_float_to_str(char *result, long double num, Flags flags);
+void s21_g_float_to_str(char *result, long double num, Flags *flags);
 
 void s21_char_to_str(char **result, char c);
 void s21_str_to_str(char *result, char *str, Flags *flags);

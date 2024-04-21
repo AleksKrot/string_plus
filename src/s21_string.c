@@ -255,18 +255,19 @@ static void s21_flags_float(char *result, char *str, char *prefix,
   }
 }
 // для %f
-void s21_float_to_str(char *result, long double num, Flags *flags) {
+void s21_float_to_str(char *result, long double num, Flags flags) {
   if (result != NULL) {
     Flags int_flags;
     s21_zero_flags(&int_flags);
     char prefix[2] = "";
     char float_str[10000] = "0";
-    if (flags->sign && num >= 0) {
+    if (flags.sign && num >= 0) {
       s21_strncat(prefix, "+", 1);
-    }
-    if (num < 0) {
+    } else if (num < 0) {
       num *= -1;
       s21_strncat(prefix, "-", 1);
+    } else if (flags.space) {
+      s21_strncat(prefix, " ", 1);
     }
     int count_div = 0;
     while (num >= 1.0) {
@@ -281,18 +282,21 @@ void s21_float_to_str(char *result, long double num, Flags *flags) {
       s21_int_to_str(float_str, (int)num, 10, &int_flags);
       count_div--;
     }
-    if (flags->sharp || flags->accuracy != 0) {
+    if (flags.is_g) {
+      if (float_str[1] != '0' && s21_strlen(float_str) != 2) {
+        flags.accuracy -= s21_strlen(float_str) - 1;
+      }
+    }
+    if (flags.sharp || flags.accuracy != 0) {
       s21_strncat(float_str, ".", 1);
     }
-
-    while (flags->accuracy > 0) {
+    while (flags.accuracy > 0) {
       num = (num - (int)num) * 10;
       s21_int_to_str(float_str, (int)num, 10, &int_flags);
-      flags->accuracy--;
+      flags.accuracy--;
     }
 
     int round = (int)((num - (int)num) * 10);
-
     if (round >= 5) {
       round = 1;
       int pos = s21_strlen(float_str) - 1;
@@ -309,25 +313,35 @@ void s21_float_to_str(char *result, long double num, Flags *flags) {
         pos--;
       }
     }
+    if (flags.is_g && s21_strchr(float_str, '.') != NULL && !flags.sharp) {
+      size_t i = s21_strlen(float_str) - 1;
+      while (float_str[i] != '.' && float_str[i] == '0') {
+        float_str[i] = '\0';
+        i--;
+      }
+      if (float_str[i] == '.') {
+        float_str[i] = '\0';
+      }
+    }
     if (float_str[0] == '1') {
-      s21_flags_float(result, float_str, prefix, flags);
+      s21_flags_float(result, float_str, prefix, &flags);
     } else {
-      s21_flags_float(result, float_str + 1, prefix, flags);
+      s21_flags_float(result, float_str + 1, prefix, &flags);
     }
   }
 }
 
 // для %e и %E
-void s21_notat_float_to_str(char *result, long double num, Flags *flags) {
+void s21_notat_float_to_str(char *result, long double num, Flags flags) {
   if (result != NULL) {
     char prefix[2] = "";
-    char float_str[1000] = ""; // ИЗМЕНИТЬ !!!!
-    if (flags->sign && num >= 0) {
+    char float_str[10000] = "";
+    if (flags.sign && num >= 0) {
       s21_strncat(prefix, "+", 1);
     } else if (num < 0) {
       num *= -1;
       s21_strncat(prefix, "-", 1);
-    } else if (flags->space) {
+    } else if (flags.space) {
       s21_strncat(prefix, " ", 1);
     }
     int exp = 0;
@@ -344,9 +358,29 @@ void s21_notat_float_to_str(char *result, long double num, Flags *flags) {
     }
     Flags float_flags;
     s21_zero_flags(&float_flags);
-    float_flags.accuracy = flags->accuracy;
-    float_flags.sharp = flags->sharp;
-    s21_float_to_str(float_str, num, &float_flags);
+    if (flags.is_g) {
+      flags.accuracy--;
+    }
+    float_flags.accuracy = flags.accuracy;
+    float_flags.sharp = flags.sharp;
+    s21_float_to_str(float_str, num, float_flags);
+    if (float_str[2] == '.') {
+      char x = float_str[1];
+      float_str[1] = float_str[2];
+      float_str[2] = x;
+      exp++;
+      float_str[s21_strlen(float_str) - 1] = '\0';
+    }
+    if (flags.is_g && s21_strchr(float_str, '.') != NULL && !flags.sharp) {
+      size_t i = s21_strlen(float_str) - 1;
+      while (float_str[i] != '.' && float_str[i] == '0') {
+        float_str[i] = '\0';
+        i--;
+      }
+      if (float_str[i] == '.') {
+        float_str[i] = '\0';
+      }
+    }
     s21_strncat(float_str, "e", 1);
     if (exp < 0) {
       s21_strncat(float_str, "-", 1);
@@ -359,22 +393,39 @@ void s21_notat_float_to_str(char *result, long double num, Flags *flags) {
     }
     float_flags.accuracy = -1;
     s21_int_to_str(float_str, exp, 10, &float_flags);
-    s21_flags_float(result, float_str, prefix, flags);
+    s21_flags_float(result, float_str, prefix, &flags);
   }
 }
 
+static size_t s21_significant_digit_float(char *res) {
+  int count = 0;
+  if (res != NULL) {
+    size_t i = 0;
+    while ((!is_digit(res[i]) || res[i] == '0') && i < s21_strlen(res)) {
+      i++;
+    }
+    while ((is_digit(res[i]) || res[i] == '.') && i < s21_strlen(res)) {
+      if (res[i] != '.') {
+        count++;
+      }
+      i++;
+    }
+  }
+  return count;
+}
+
 // для g и G
-void s21_g_float_to_str(char *result, float num, Flags *flags) {
+void s21_g_float_to_str(char *result, long double num, Flags *flags) {
   if (result != NULL) {
     size_t len0 = s21_strlen(result);
-    s21_notat_float_to_str(result, num, flags);
-    size_t len1 = s21_strlen(result);
+    s21_notat_float_to_str(result, num, *flags);
+    size_t len1 = s21_significant_digit_float(result + len0);
     result[len0] = '\0';
-    s21_float_to_str(result, num, flags);
-    size_t len2 = s21_strlen(result);
+    s21_float_to_str(result, num, *flags);
+    size_t len2 = s21_significant_digit_float(result + len0);
     if (len1 < len2) {
       result[len0] = '\0';
-      s21_notat_float_to_str(result, num, flags);
+      s21_notat_float_to_str(result, num, *flags);
     }
   }
 }
@@ -556,19 +607,21 @@ int s21_sprintf(char *str, const char *format, ...) {
           break;
         case 'E':
           flags.is_up = true;
-          s21_notat_float_to_str(str, GET_ARG_FLOAT, &flags);
+          s21_notat_float_to_str(str, GET_ARG_FLOAT, flags);
           break;
         case 'e':
-          s21_notat_float_to_str(str, GET_ARG_FLOAT, &flags);
+          s21_notat_float_to_str(str, GET_ARG_FLOAT, flags);
           break;
         case 'f':
-          s21_float_to_str(str, GET_ARG_FLOAT, &flags);
+          s21_float_to_str(str, GET_ARG_FLOAT, flags);
           break;
         case 'G':
           flags.is_up = true;
+          flags.is_g = true;
           s21_g_float_to_str(str, GET_ARG_FLOAT, &flags);
           break;
         case 'g':
+          flags.is_g = true;
           s21_g_float_to_str(str, GET_ARG_FLOAT, &flags);
           break;
         case 'p':
