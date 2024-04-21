@@ -22,5 +22,5 @@ Suite *s21_strncpy_suite(void);
 
 Suite *s21_strlen_suite(void);
 
-Suite *s21_sprintf_d_suite(void);
+Suite *s21_sprintf_suite(void);
 #endif

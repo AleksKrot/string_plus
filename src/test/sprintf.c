@@ -1407,9 +1407,9 @@ START_TEST(sprintf_parse_1) {
 }
 END_TEST
 
-Suite *s21_sprintf_d_suite(void) {
-  Suite *suite = suite_create("int res1 = s21_sprintf_d_test");
-  TCase *tcase_core = tcase_create("int res1 = s21_sprintf_d_test");
+Suite *s21_sprintf_suite(void) {
+  Suite *suite = suite_create("int res1 = s21_sprintf_test");
+  TCase *tcase_core = tcase_create("int res1 = s21_sprintf_test");
 
   tcase_add_test(tcase_core, sprintf_d_1);
   tcase_add_test(tcase_core, sprintf_d_2);

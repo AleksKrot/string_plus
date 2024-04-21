@@ -26,7 +26,7 @@ void run_tests() {
                          s21_strchr_suite(),
                          s21_strncmp_suite(),
                          s21_strncpy_suite(),
-                         s21_sprintf_d_suite(),
+                         s21_sprintf_suite(),
                          NULL};
 
   for (Suite **testcase = list_cases; *testcase; testcase++) {
