@@ -29,7 +29,7 @@ void *s21_to_upper(const char *str) {
     return S21_NULL;
   }
   // Вычисляем длину строки
-  size_t len = 0;
+  s21_size_t len = 0;
   while (str[len]) len++;
 
   // Выделяем память под новую строку (+1 для нуль-терминатора)
@@ -38,13 +38,15 @@ void *s21_to_upper(const char *str) {
     return S21_NULL;
   }
 
-  for (size_t i = 0; i <= len; i++) {
+  for (s21_size_t i = 0; i < len; i++) {
     if (str[i] >= 'a' && str[i] <= 'z') {
       result[i] = str[i] - ('a' - 'A');  // Переводим в верхний регистр
     } else {
       result[i] = str[i];  // Копируем без изменений
     }
   }
+  result[len] = '\0';  // Явное добавление терминатора
+
   return result;
 }
 
@@ -53,7 +55,7 @@ void *s21_to_lower(const char *str) {
     return S21_NULL;
   }
   // Вычисляем длину строки
-  size_t len = 0;
+  s21_size_t len = 0;
   while (str[len]) len++;
 
   // Выделяем память под новую строку (+1 для нуль-терминатора)
@@ -62,12 +64,14 @@ void *s21_to_lower(const char *str) {
     return S21_NULL;
   }
 
-  for (size_t i = 0; i <= len; i++) {
+  for (s21_size_t i = 0; i < len; i++) {
     if (str[i] >= 'A' && str[i] <= 'Z') {
       result[i] = str[i] + ('a' - 'A');  // Переводим в нижний регистр
     } else {
       result[i] = str[i];  // Копируем без изменений
     }
   }
+  result[len] = '\0';  // Явное добавление терминатора
+
   return result;
 }
