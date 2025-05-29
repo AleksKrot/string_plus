@@ -1,56 +1,39 @@
 #include <check.h>
 #include <string.h>
 
+#define TEST_MEMCHR
+#define TEST_MEMCMP
+#define TEST_MEMCPY
+
 #include "s21_string_function.h"
-
-START_TEST(s21_memchr_basic_test) {
-    const char *str = "Hello, World!";
-    char c = 'o';
-    s21_size_t n = 14;
-    void *result = s21_memchr(str, c, n);
-    ck_assert_ptr_nonnull(result);
-    ck_assert_ptr_eq(result, memchr(str, c, strlen(str)));
-}
-END_TEST
-
-START_TEST(s21_memchr_absence_test) {
-    const char *str = "Hello, World!";
-    char c = 'B';
-    s21_size_t n = 14;
-    void *result = s21_memchr(str, c, n);
-    ck_assert_ptr_null(result);
-    ck_assert_ptr_eq(result, memchr(str, c, strlen(str)));
-}
-END_TEST
-
-START_TEST(s21_memchr_double_test) {
-    const char *str = "Hello, World!";
-    char c = 'l';
-    s21_size_t n = 14;
-    void *result = s21_memchr(str, c, n);
-    ck_assert_ptr_nonnull(result);
-    ck_assert_ptr_eq(result, memchr(str, c, strlen(str)));
-}
-END_TEST
-
-Suite *s21_memchr_suite(void) {
-    Suite *s = suite_create("s21_memchr");
-    TCase *tc = tcase_create("Core");
-
-    tcase_add_test(tc, s21_memchr_basic_test);
-    tcase_add_test(tc, s21_memchr_absence_test);
-    tcase_add_test(tc, s21_memchr_double_test);
-    suite_add_tcase(s, tc);
-    
-    return s;
-}
+#include "s21_string_test.h"
 
 int main(void) {
     int number_failed;
     int result;
-    Suite *s = s21_memchr_suite();
-    SRunner *sr = srunner_create(s);
 
+    Suite *(*test_suites[])() = {
+    #ifdef TEST_MEMCHR
+        s21_memchr_suite,
+    #endif
+
+    #ifdef TEST_MEMCMP
+        s21_memcmp_suite,
+    #endif
+
+    #ifdef TEST_MEMCPY
+        s21_memcpy_suite,
+    #endif
+        NULL
+    };
+
+    SRunner *sr = srunner_create(NULL);
+    
+    for (int i = 0; *(test_suites + i) != NULL; i++) {
+        Suite *s = test_suites[i]();
+        srunner_add_suite(sr, s);
+    }
+    
     srunner_run_all(sr, CK_VERBOSE);
     number_failed = srunner_ntests_failed(sr);
     srunner_free(sr);
