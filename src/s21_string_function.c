@@ -74,3 +74,16 @@ char *s21_strchr(const char *str, int c) {
     }
     return result;
 }
+
+char *s21_strrchr(const char *str, int c) {
+    const char *s = str;
+    void *result = NULL;
+    int i = 0;
+    while (*(s + i) != '\0') {
+        if (*(s + i) == (unsigned char)c) {
+            result = (void *)(s + i);
+        }
+        i++;
+    }
+    return result;
+}
