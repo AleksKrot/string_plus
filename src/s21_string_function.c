@@ -61,3 +61,16 @@ char *s21_strncat(char *dest, const char *src, s21_size_t n) {
     }
     return d;
 }
+
+char *s21_strchr(const char *str, int c) {
+    const char *s = str;
+    void *result = NULL;
+    int i = 0;
+    while (*(s + i) != '\0' && result == NULL) {
+        if (*(s + i) == (unsigned char)c) {
+            result = (void *)(s + i);
+        }
+        i++;
+    }
+    return result;
+}
