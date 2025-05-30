@@ -51,3 +51,13 @@ s21_size_t s21_strlen(const char *str)
     }
     return len;
 } 
+
+char *s21_strncat(char *dest, const char *src, s21_size_t n) {
+    char *d = dest;
+    char *d_finish = d + s21_strlen(d);
+    const char *s = src;
+    for (s21_size_t i = 0; i < n; i++) {
+        *(d_finish + i) = *(s + i);
+    }
+    return d;
+}
