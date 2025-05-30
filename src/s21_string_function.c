@@ -87,3 +87,15 @@ char *s21_strrchr(const char *str, int c) {
     }
     return result;
 }
+
+int s21_strncmp(const char *str1, const char *str2, s21_size_t n) {
+    int result = 0;
+    const char *s1 = str1;
+    const char *s2 = str2;
+    for (s21_size_t i = 0; i < n; i++) {
+        if (*(s1 + i) != *(s2 + i)) {
+            result = *(s1 + i) - *(s2 + i);
+        }
+    }
+    return result;
+}
