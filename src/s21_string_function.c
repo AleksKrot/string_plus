@@ -34,3 +34,11 @@ void *s21_memcpy(void *dest, const void *src, s21_size_t n) {
     }
     return dest;
 }
+
+void *s21_memset(void *str, int c, s21_size_t n) {
+    char *s = str;
+    for (s21_size_t i = 0; i < n; i++) {
+        *(s + i) = (unsigned char)c;
+    }
+    return s;
+}
