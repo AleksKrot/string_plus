@@ -99,3 +99,27 @@ int s21_strncmp(const char *str1, const char *str2, s21_size_t n) {
     }
     return result;
 }
+
+char *s21_strncpy(char *dest, const char *src, s21_size_t n) {
+    char *d = dest;
+    const char *s = src;
+    for (s21_size_t i = 0; i < n; i++) {
+        *(d + i) = *(s + i);
+    }
+    return dest;
+}
+
+s21_size_t s21_strcspn(const char *str1, const char *str2) {
+    s21_size_t result = 0;
+    for (s21_size_t i = 0; i < s21_strlen(str1) && result == 0; i++) {
+        for (s21_size_t j = 0; j < s21_strlen(str2); j++) {
+            if (*(str1 + i) == *(str2 + j)) {
+                result = i;
+            }
+        }
+    }
+    if (result == 0) {
+        result = s21_strlen(str1);
+    }
+    return result;
+}
