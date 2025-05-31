@@ -1,29 +1,16 @@
-#include <check.h>
-#include <string.h>
-
-#define TEST_MEMCHR
-#define TEST_MEMCMP
-#define TEST_MEMCPY
-
 #include "s21_string_function.h"
-#include "s21_string_test.h"
+#include "s21_memchr_test.c"
+#include "s21_memcmp_test.c"
+#include "s21_memcpy_test.c"
 
 int main(void) {
     int number_failed;
     int result;
 
     Suite *(*test_suites[])() = {
-    #ifdef TEST_MEMCHR
         s21_memchr_suite,
-    #endif
-
-    #ifdef TEST_MEMCMP
         s21_memcmp_suite,
-    #endif
-
-    #ifdef TEST_MEMCPY
         s21_memcpy_suite,
-    #endif
         NULL
     };
 
@@ -34,7 +21,7 @@ int main(void) {
         srunner_add_suite(sr, s);
     }
     
-    srunner_run_all(sr, CK_VERBOSE);
+    srunner_run_all(sr, CK_NORMAL);
     number_failed = srunner_ntests_failed(sr);
     srunner_free(sr);
 
