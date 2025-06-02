@@ -15,8 +15,25 @@ void *s21_memchr(const void *str, int c, size_t n) {
 }
 
 int s21_memcmp(const void *str1, const void *str2, s21_size_t n) {
-  
+  // По стандарту: функция не должна обрабатывать NULL специально. 
+  const unsigned char *p1 = str1, *p2 = str2;
+
+  for (size_t i = 0; i < n; i++) {
+    if (p1[i] != p2[i]) {
+      return p1[i] - p2[i];
+    }
+  }
+  return 0;
 }
+
+void *s21_memcpy(void *dest, const void *src, s21_size_t n) {
+
+}
+
+
+
+
+
 
 size_t s21_strlen(const char *str) {
   size_t len = 0;
