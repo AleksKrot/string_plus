@@ -3,19 +3,16 @@
 #include <stdio.h>
 
 void *s21_memchr(const void *str, int c, size_t n) {
-  if (str) {  // В стандартной memchr проверки нет
-    const unsigned char *p = str;
-    for (size_t i = 0; i < n; i++) {
-      if (p[i] == (unsigned char)c) {
-        return (void *)(p + i);
-      }
+  const unsigned char *p = str;
+  for (size_t i = 0; i < n; i++) {
+    if (p[i] == (unsigned char)c) {
+      return (void *)(p + i);
     }
   }
   return S21_NULL;  // В стандартной memchr также два выхода из функции
 }
 
 int s21_memcmp(const void *str1, const void *str2, s21_size_t n) {
-  // По стандарту: функция не должна обрабатывать NULL специально.
   const unsigned char *p1 = str1, *p2 = str2;
 
   for (s21_size_t i = 0; i < n; i++) {
@@ -36,12 +33,33 @@ void *s21_memcpy(void *dest, const void *src, s21_size_t n) {
   return dest;
 }
 
-size_t s21_strlen(const char *str) {
-  size_t len = 0;
-  if (str) {  // В стандартной реализации нет проверки на NULL
-    for (; *(str + len); len++);  // Здесь происходит разыменование указателя,
-                                  // т.е. получаем символ в позиции len
+void *s21_memset(void *str, int c, s21_size_t n) {
+  unsigned char *s = str;
+
+  for (s21_size_t i = 0; i < n; i++) {
+    s[i] = (unsigned char)c;
   }
+  return str;
+}
+
+char *s21_strncat(char *dest, const char *src, s21_size_t n) {
+  if (dest && src) {
+    char *d = dest;
+
+    while (*d) d++;  // Находим конец dest
+    while (*src && n--) {
+      *d++ = *src++;
+    }
+    *d = '\0';
+  }
+  return dest;
+}
+
+size_t s21_strlen(const char *str) {
+  s21_size_t len = 0;
+
+  for (; *(str + len); len++);  // Здесь происходит разыменование указателя,
+                                // т.е. получаем символ в позиции len
   return len;
 }
 
@@ -64,7 +82,6 @@ void *s21_to_upper(const char *str) {
       result[len] = '\0';  // Добавление терминатора
     }
   }
-
   return result;
 }
 
