@@ -2,15 +2,20 @@
 
 #include <stdio.h>
 
-void *s21_memchr(const void *str, int c, s21_size_t n) {
-  void *result = S21_NULL;
-  const unsigned char *s = str;
-  for (s21_size_t i = 0; i < n && result == S21_NULL; i++) {
-    if (s[i] == (unsigned char)c) {
-      result = (void *)(s + i);
+void *s21_memchr(const void *str, int c, size_t n) {
+  if (str) {  // В стандартной memchr проверки нет
+    const unsigned char *p = str;
+    for (size_t i = 0; i < n; i++) {
+      if (p[i] == (unsigned char)c) {
+        return (void *)(p + i);
+      }
     }
   }
-  return result;
+  return S21_NULL; // В стандартной memchr также два выхода из функции
+}
+
+int s21_memcmp(const void *str1, const void *str2, s21_size_t n) {
+  
 }
 
 size_t s21_strlen(const char *str) {
