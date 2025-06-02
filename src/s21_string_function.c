@@ -11,14 +11,14 @@ void *s21_memchr(const void *str, int c, size_t n) {
       }
     }
   }
-  return S21_NULL; // В стандартной memchr также два выхода из функции
+  return S21_NULL;  // В стандартной memchr также два выхода из функции
 }
 
 int s21_memcmp(const void *str1, const void *str2, s21_size_t n) {
-  // По стандарту: функция не должна обрабатывать NULL специально. 
+  // По стандарту: функция не должна обрабатывать NULL специально.
   const unsigned char *p1 = str1, *p2 = str2;
 
-  for (size_t i = 0; i < n; i++) {
+  for (s21_size_t i = 0; i < n; i++) {
     if (p1[i] != p2[i]) {
       return p1[i] - p2[i];
     }
@@ -27,13 +27,14 @@ int s21_memcmp(const void *str1, const void *str2, s21_size_t n) {
 }
 
 void *s21_memcpy(void *dest, const void *src, s21_size_t n) {
+  char *d = dest;
+  char const *s = src;
 
+  for (s21_size_t i = 0; i < n; i++) {
+    d[i] = s[i];
+  }
+  return dest;
 }
-
-
-
-
-
 
 size_t s21_strlen(const char *str) {
   size_t len = 0;
@@ -100,7 +101,7 @@ void *s21_insert(const char *src, const char *str, size_t start_index) {
 
     if (result) {
       // Копируем часть до start_index
-      size_t i;
+      s21_size_t i;
       for (i = 0; i < start_index; i++) {
         result[i] = src[i];
       }
