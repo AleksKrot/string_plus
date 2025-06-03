@@ -55,6 +55,12 @@ char *s21_strncat(char *dest, const char *src, s21_size_t n) {
   return dest;
 }
 
+char *s21_strchr(const char *str, int c) {
+  char ch = (char)c;
+  while (*str && *str != ch) str++;
+  return (*str == ch) ? (char *)str : S21_NULL;
+}
+
 size_t s21_strlen(const char *str) {
   s21_size_t len = 0;
 
