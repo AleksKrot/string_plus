@@ -29,7 +29,7 @@ char *s21_strncat(char *dest, const char *src, s21_size_t n);
 // указывает аргумент str.
 char *s21_strchr(const char *str, int c);
 
-// Функция для сравнения двух строк
+// Функция сравнивает не более первых n байтов str1 и str2.
 int s21_strncmp(const char *str1, const char *str2, s21_size_t n);
 
 // Функция для копирование строки

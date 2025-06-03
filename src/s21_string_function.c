@@ -61,6 +61,21 @@ char *s21_strchr(const char *str, int c) {
   return (*str == ch) ? (char *)str : S21_NULL;
 }
 
+int s21_strncmp(const char *str1, const char *str2, s21_size_t n) {
+  int result = 0;
+  for (size_t i = 0; i < n; i++) {
+    unsigned char c1 = str1[i], c2 = str2[i];
+    if (c1 != c2) {
+      result = c1 - c2;
+      break;
+    }
+    if (c1 == '\0') {
+      break;
+    }
+  }
+  return result;
+}
+
 size_t s21_strlen(const char *str) {
   s21_size_t len = 0;
 
