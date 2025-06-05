@@ -2,6 +2,7 @@
 
 #include <stdbool.h>
 
+// Структура для хранения флагов
 typedef struct {
     bool minus;
     bool plus;
@@ -10,22 +11,26 @@ typedef struct {
     bool zero;
 } Flags;
 
+// Структура для хранения ширины
 typedef struct {
     int number;
     bool asterisk;
 } Width;
 
+// Структура для хранения точности
 typedef struct {
     int number;
     bool asterisk;
-} Accuracy;
+} Accur;
 
+// Структура для хранения длины
 typedef struct {
     bool h;
     bool l;
     bool L;
 } Length;
 
+// Структура для хранения спецификаторов
 typedef struct {
     bool c;
     bool d;
@@ -43,39 +48,49 @@ typedef struct {
     bool p;
     bool n;
     bool percent;
-} Specifiers;
+} Spec;
 
-void init_struct(Flags *flag, Width *width, Accuracy *accur, Length *length, Specifiers *spec) {
-    flag->minus = false;
-    flag->plus = false;
-    flag->space = false;
-    flag->hashtag = false;
-    flag->zero = false;
+// Структура описывающая форматированный вывод
+typedef struct {
+    Flags flag;
+    Width width;
+    Accur accur;
+    Length length;
+    Spec spec;
+} Format;
 
-    width->number = 0;
-    width->asterisk = false;
 
-    accur->number = 0;
-    accur->asterisk = false;
+void init_struct(Format *format) {
+    format->flag.minus = false;
+    format->flag.plus = false;
+    format->flag.space = false;
+    format->flag.hashtag = false;
+    format->flag.zero = false;
 
-    length->h = false;
-    length->l = false;
-    length->L = false;
+    format->width.number = 0;
+    format->width.asterisk = false;
 
-    spec->c = false;
-    spec->d = false;
-    spec->i = false;
-    spec->e = false;
-    spec->E = false;
-    spec->f = false;
-    spec->g = false;
-    spec->G = false;
-    spec->o = false;
-    spec->s = false;
-    spec->u = false;
-    spec->x = false;
-    spec->X = false;
-    spec->p = false;
-    spec->n = false;
-    spec->percent = false;
+    format->accur.number = 0;
+    format->accur.asterisk = false;
+
+    format->length.h = false;
+    format->length.l = false;
+    format->length.L = false;
+
+    format->spec.c = false;
+    format->spec.d = false;
+    format->spec.i = false;
+    format->spec.e = false;
+    format->spec.E = false;
+    format->spec.f = false;
+    format->spec.g = false;
+    format->spec.G = false;
+    format->spec.o = false;
+    format->spec.s = false;
+    format->spec.u = false;
+    format->spec.x = false;
+    format->spec.X = false;
+    format->spec.p = false;
+    format->spec.n = false;
+    format->spec.percent = false;
 }
