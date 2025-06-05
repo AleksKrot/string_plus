@@ -44,3 +44,38 @@ typedef struct {
     bool n;
     bool percent;
 } Specifiers;
+
+void init_struct(Flags *flag, Width *width, Accuracy *accur, Length *length, Specifiers *spec) {
+    flag->minus = false;
+    flag->plus = false;
+    flag->space = false;
+    flag->hashtag = false;
+    flag->zero = false;
+
+    width->number = 0;
+    width->asterisk = false;
+
+    accur->number = 0;
+    accur->asterisk = false;
+
+    length->h = false;
+    length->l = false;
+    length->L = false;
+
+    spec->c = false;
+    spec->d = false;
+    spec->i = false;
+    spec->e = false;
+    spec->E = false;
+    spec->f = false;
+    spec->g = false;
+    spec->G = false;
+    spec->o = false;
+    spec->s = false;
+    spec->u = false;
+    spec->x = false;
+    spec->X = false;
+    spec->p = false;
+    spec->n = false;
+    spec->percent = false;
+}
