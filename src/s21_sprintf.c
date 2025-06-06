@@ -1,16 +1,54 @@
+#include "s21_sprintf.h"
+
 #include <stdarg.h>  // Предназначена для работы с функциями с переменным числом аргументов
 #include <stdio.h>
 
-#include "s21_string_function.h"
-
-int sprintf(char *str, const char *format, ...);
+#include "s21_string.h"
 
 int main() {
+  Format format;
+  init_struct(&format);
+
   char buffer[256];
-  int count = sprintf(buffer, "Hi, %c=%d%%!", 'A', -100);
+  int count = sprintf(buffer, "Hi, %5c=%d", 'A', -100);
   printf("%s\nCount = %d", buffer, count);
 
   return 0;
+}
+
+void init_struct(Format *format) {
+  format->flag.minus = false;
+  format->flag.plus = false;
+  format->flag.space = false;
+  format->flag.hashtag = false;
+  format->flag.zero = false;
+
+  format->width.number = 0;
+  format->width.asterisk = false;
+
+  format->accur.number = 0;
+  format->accur.asterisk = false;
+
+  format->length.h = false;
+  format->length.l = false;
+  format->length.L = false;
+
+  format->spec.c = false;
+  format->spec.d = false;
+  format->spec.i = false;
+  format->spec.e = false;
+  format->spec.E = false;
+  format->spec.f = false;
+  format->spec.g = false;
+  format->spec.G = false;
+  format->spec.o = false;
+  format->spec.s = false;
+  format->spec.u = false;
+  format->spec.x = false;
+  format->spec.X = false;
+  format->spec.p = false;
+  format->spec.n = false;
+  format->spec.percent = false;
 }
 
 int sprintf(char *str, const char *format, ...) {
@@ -30,15 +68,20 @@ int sprintf(char *str, const char *format, ...) {
       continue;
     }
 
-    // Обработка спецификаторов
     format++;  // Пропускаем '%'
 
+    // Обработка %%
     if (*format == '%') {
       *str++ = *format++;
       count++;
       continue;
     }
 
+    // Парсинг спецификатора
+    Format spec;
+    format = parse_format_spec(format, &spec);
+
+    // Обработка аргументов
     switch (*format++) {
       case 'c': {
         char c = (char)va_arg(args, int);  // char повышается до int
@@ -176,4 +219,63 @@ int sprintf(char *str, const char *format, ...) {
   *str = '\0';  // Завершаем строку
   va_end(args);  // Освобождает ресурсы, связанные с va_list
   return count;  // Количество записанных символов (без учёта '\0')
+}
+
+const char *parse_format_spec(const char *fmt, Format *spec) {
+  const char *p = fmt;
+
+  // Парсинг флагов
+  while (*p == '-' || *p == '+' || *p == ' ' || *p == '0') {
+    if (*p == '-')
+      spec->flag.minus = true;
+    else if (*p == '+')
+      spec->flag.plus = true;
+    else if (*p == ' ')
+      spec->flag.space = true;
+    else if (*p == '0')
+      spec->flag.zero = true;
+    p++;
+  }
+
+  // Парсинг ширины
+  if (*p == '*') {
+    spec->width.asterisk = true;
+    p++;
+  } else if (isdigit(*p)) {
+    spec->width.number = 0;
+    while (isdigit(*p)) {
+      spec->width.number = spec->width.number * 10 + (*p - '0');
+      p++;
+    }
+  }
+
+  // Парсинг точности
+  if (*p == '*') {
+    spec->accur.asterisk = true;
+    p++;
+  } else if (*p == '.') {
+    p++;
+    spec->accur.number = 0;
+    while (isdigit(*p)) {
+      spec->accur.number = spec->accur.number * 10 + (*p - '0');
+      p++;
+    }
+  }
+
+  // Парсинг модификаторов длины
+  if (*p == 'h') {
+    spec->length.h = true;
+    p++;
+  } else if (*p == 'l') {
+    spec->length.l = true;
+    p++;
+  } else if (*p == 'L') {
+    spec->length.L = true;
+    p++;
+  }
+
+  // Парсинг спецификатора
+  if (*p == '\0') {
+    return p;  // Неверный формат
+  }
 }

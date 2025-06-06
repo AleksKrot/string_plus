@@ -1,5 +1,5 @@
-#ifndef S21_STRING_FUNCTION_H
-#define S21_STRING_FUNCTION_H
+#ifndef S21_STRING_H
+#define S21_STRING_H
 
 #define EXIT_FAILURE 1
 #define EXIT_SUCCESS 0
