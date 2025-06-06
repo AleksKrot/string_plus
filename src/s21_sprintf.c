@@ -273,9 +273,4 @@ const char *parse_format_spec(const char *fmt, Format *spec) {
     spec->length.L = true;
     p++;
   }
-
-  // Парсинг спецификатора
-  if (*p == '\0') {
-    return p;  // Неверный формат
-  }
 }
