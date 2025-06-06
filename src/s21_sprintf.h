@@ -1,0 +1,67 @@
+#ifndef S21_SPRINTF_H
+#define S21_SPRINTF_H
+
+#include <stdbool.h>
+
+// Структура для хранения флагов
+typedef struct {
+  bool minus;
+  bool plus;
+  bool space;
+  bool hashtag;
+  bool zero;
+} Flags;
+
+// Структура для хранения ширины
+typedef struct {
+  int number;
+  bool asterisk;
+} Width;
+
+// Структура для хранения точности
+typedef struct {
+  int number;
+  bool asterisk;
+} Accur;
+
+// Структура для хранения длины
+typedef struct {
+  bool h;
+  bool l;
+  bool L;
+} Length;
+
+// Структура для хранения спецификаторов
+typedef struct {
+  bool c;
+  bool d;
+  bool i;
+  bool e;
+  bool E;
+  bool f;
+  bool g;
+  bool G;
+  bool o;
+  bool s;
+  bool u;
+  bool x;
+  bool X;
+  bool p;
+  bool n;
+  bool percent;
+} Spec;
+
+typedef struct {
+  Flags flag;
+  Width width;
+  Accur accur;
+  Length length;
+  Spec spec;
+} Format;
+
+void init_struct(Format *format);
+
+int sprintf(char *str, const char *format, ...);
+const char *parse_format_spec(const char *fmt, Format *spec);
+
+#endif
