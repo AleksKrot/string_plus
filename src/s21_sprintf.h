@@ -72,6 +72,9 @@ void init_struct(Spec_form *spec_form);
 // Парсер флагов
 const char *parsing_flags(const char *ptr, Spec_form *spec_form);
 
+// Парсер ширины
+const char *parsing_width(const char *ptr, Spec_form *spec_form);
+
 // Парсер спецификатора
 const char *parsing_spec(const char *ptr, Spec_form *spec_form);
 
