@@ -64,15 +64,28 @@ int input_function(Spec_form *spec_form, char *str, const char *format, ...) {
                 format++;
                 count++;
             } else {
-                format = parsing_flags(format, spec_form);
                 format = parsing_format(format, spec_form);
             }
         }
     }
+    return count;
 }
 
 const char *parsing_flags(const char *ptr, Spec_form *spec_form) {
-    
+    if (*ptr == '-') {
+        spec_form->flag.minus = true;
+    } else if (*ptr == '+') {
+        spec_form->flag.plus = true;
+    } else if (*ptr == ' ') {
+        spec_form->flag.space = true;
+    } else if (*ptr == '#') {
+        spec_form->flag.hashtag = true;
+    } else if (*ptr == '0') {
+        spec_form->flag.zero = true;
+    } else {
+        //TODO Написать ошибку
+    }
+    return ptr +  1;
 }
 
 const char *parsing_spec(const char *ptr, Spec_form *spec_form) {
@@ -107,12 +120,13 @@ const char *parsing_spec(const char *ptr, Spec_form *spec_form) {
     } else if (*ptr == 'n') {
         spec_form->spec.n = true;
     } else {
-
+        //TODO Написать ошибку
     }
     return ptr + 1;
 }
 
 const char *parsing_format(const char *format, Spec_form *spec_form) {
     const char *ptr = format;
+    ptr = parsing_flags(ptr, spec_form);
     ptr = parsing_spec(ptr, spec_form);
 }
