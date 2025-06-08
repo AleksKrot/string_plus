@@ -2,6 +2,7 @@
 #define S21_SPRINTF_H
 
 #include <stdbool.h>
+#include <stdarg.h>
 
 // Структура для хранения флагов
 typedef struct {
