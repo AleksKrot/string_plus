@@ -88,6 +88,21 @@ const char *parsing_flags(const char *ptr, Spec_form *spec_form) {
     return ptr +  1;
 }
 
+const char *parsing_width(const char *ptr, Spec_form *spec_form) {
+    if (isdigit(*ptr)) {
+        spec_form->width.number = 0;
+        while(isdigit(*ptr)) {
+            spec_form->width.number = spec_form->width.number * 10 + (*ptr - '0');
+            ptr++;
+        }
+    } else if (*ptr == '*') {
+        spec_form->width.asterisk = true;
+    } else {
+        //TODO Написать ошибку
+    }
+    return ptr + 1;
+}
+
 const char *parsing_spec(const char *ptr, Spec_form *spec_form) {
     if (*ptr == 'c') {
         spec_form->spec.c = true;
@@ -128,5 +143,6 @@ const char *parsing_spec(const char *ptr, Spec_form *spec_form) {
 const char *parsing_format(const char *format, Spec_form *spec_form) {
     const char *ptr = format;
     ptr = parsing_flags(ptr, spec_form);
+    ptr = parsing_width(ptr, spec_form);
     ptr = parsing_spec(ptr, spec_form);
 }
