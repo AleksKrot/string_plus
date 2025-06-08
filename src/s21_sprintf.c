@@ -5,12 +5,14 @@
 #include <stdarg.h>
 
 int s21_sprintf(char *str, const char *format, ...) {
-    char sym = 'c';
-    input_function(str, format, sym);
-    return 0;
+    va_list args;
+    va_start(args, format);
+    int count = input_function(str, format, args); // TODO Разобраться с count
+    va_end(args);
+    return count;
 }
 
-int input_function(char *str, const char *format, ...) {
+int input_function(char *str, const char *format, va_list args) {
     int count = 0;
     Spec_form spec_form;
     while (*format != '\0') {
@@ -28,6 +30,7 @@ int input_function(char *str, const char *format, ...) {
                 count++;
             } else {
                 format = parsing_format(format, &spec_form);
+                process_format(&spec_form, args, &str, &count);
             }
         }
     }
@@ -54,7 +57,7 @@ const char *parsing_format(const char *format, Spec_form *spec_form) {
     return ptr;
 }
 
-void init_struct(Spec_form *spec_form) {
+void init_struct(Spec_form *spec_form) { // TODO Рассмотреть возможность сокращения за счет составного литерата
     spec_form->flag.minus = false;
     spec_form->flag.plus = false;
     spec_form->flag.space = false;
@@ -192,4 +195,11 @@ const char *parsing_spec(const char *ptr, Spec_form *spec_form) {
         //TODO Написать ошибку и разобраться с ptr при ошибке
     }
     return ptr + 1;
+}
+
+void process_format(Spec_form *spec_form, va_list args, char *str, int count) {
+    if (spec_form->flag.minus || spec_form->flag.plus || spec_form->flag.space || spec_form->flag.hashtag || spec_form->flag.zero) {
+
+    }
+    // TODO Написать функции обрабтки формата
 }
