@@ -24,10 +24,10 @@ test: s21_string.a
 		$(TEST_DIR)/s21_string_test
 
 gcov_report: test
-		cd $(SRC_DIR) && gcovr $(GCOVR_FLAGS) --root $(TEST_DIR)
+		gcovr $(GCOVR_FLAGS)
 
 clean:
-		rm -f $(SRC_DIR)/s21_string.a $(SRC_DIR)/*.o 
-		rm -f $(TEST_DIR)/s21_string_test $(TEST_DIR)/*.gcda $(TEST_DIR)/*.gcno $(TEST_DIR)/*.html $(TEST_DIR)/*.css
+		rm -f $(SRC_DIR)/s21_string.a $(SRC_DIR)/*.o $(SRC_DIR)/*.html $(SRC_DIR)/*.css
+		rm -f $(TEST_DIR)/s21_string_test $(TEST_DIR)/*.gcda $(TEST_DIR)/*.gcno 
 
 rebuild: clean all
