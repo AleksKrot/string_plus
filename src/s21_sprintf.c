@@ -197,9 +197,39 @@ const char *parsing_spec(const char *ptr, Spec_form *spec_form) {
     return ptr + 1;
 }
 
-void process_format(Spec_form *spec_form, va_list args, char *str, int count) {
-    if (spec_form->flag.minus || spec_form->flag.plus || spec_form->flag.space || spec_form->flag.hashtag || spec_form->flag.zero) {
+void process_format(Spec_form *spec_form, va_list args, char **str, int *count) {
+    char temp[256] = {0};
+    int len = 0;
+
+    process_spec(spec_form, args, temp, &len);
+
+    /*if (spec_form->flag.minus || spec_form->flag.plus || spec_form->flag.space || spec_form->flag.hashtag || spec_form->flag.zero) {
+        process_flag(spec_form, &str, &count);
+    }*/
+
+    // TODO Написать функции обрабтки формата
+    for (int i = 0; i < len; i++) {
+        **str = *(temp + i);
+        (*str)++;
+        (*count)++;
+    }
+}
+
+void process_spec(Spec_form *spec_form, va_list args, char *temp, int *len) {
+    if (spec_form->spec.c) {
+        spec_form->flag.plus = false;
+        spec_form->flag.space = false;
+        spec_form->prec.number = 0;
+        spec_form->length.h = false;
+        spec_form->length.l = false;
+        char c = va_arg(args, int);
+        *(temp + *len) = c;
+        (*len)++;
+    }
+}
+
+/*void process_flag(Spec_form *spec_form, char **str, int *count) {
+    if (spec_form->flag.minus) {
 
     }
-    // TODO Написать функции обрабтки формата
-}
+}*/
