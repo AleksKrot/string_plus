@@ -75,6 +75,9 @@ const char *parsing_flags(const char *ptr, Spec_form *spec_form);
 // Парсер ширины
 const char *parsing_width(const char *ptr, Spec_form *spec_form);
 
+// Парсер точности
+const char *parsing_prec(const char *ptr, Spec_form *spec_form);
+
 // Парсер спецификатора
 const char *parsing_spec(const char *ptr, Spec_form *spec_form);
 
