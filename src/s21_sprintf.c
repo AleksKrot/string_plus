@@ -6,7 +6,6 @@
 
 int s21_sprintf(char *str, const char *format, ...) {
     char str[256];
-    int sym = 'c';
     Spec_form spec_form;
     init_struct(&spec_form);
     return 0;
@@ -118,6 +117,19 @@ const char *parsing_prec(const char *ptr, Spec_form *spec_form) {
     return ptr + 1;
 }
 
+const char *parsing_length(const char *ptr, Spec_form *spec_form) {
+    if (*ptr == 'h') {
+        spec_form->length.h = true;
+    } else if (*ptr == 'l') {
+        spec_form->length.l = true;
+    } else if (*ptr == 'L') {
+        spec_form->length.L = true;
+    } else {
+        //TODO Написать ошибку
+    }
+    return ptr + 1;
+}
+
 const char *parsing_spec(const char *ptr, Spec_form *spec_form) {
     if (*ptr == 'c') {
         spec_form->spec.c = true;
@@ -164,6 +176,7 @@ const char *parsing_format(const char *format, Spec_form *spec_form) {
         ptr++;
         ptr = parsing_prec(ptr, spec_form);
     }
+    ptr = parsing_length(ptr, spec_form);
     ptr = parsing_spec(ptr, spec_form);
     return ptr;
 }
