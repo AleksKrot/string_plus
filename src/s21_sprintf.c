@@ -1,8 +1,8 @@
-#include "s21_string_function.h"
+#include "s21_string.h"
 #include "s21_sprintf.h"
 
 #include <stdio.h>
-#include <stdarg.h>
+#include <ctype.h>
 
 int s21_sprintf(char *str, const char *format, ...) {
     va_list args;
