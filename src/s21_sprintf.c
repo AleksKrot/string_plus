@@ -5,10 +5,53 @@
 #include <stdarg.h>
 
 int s21_sprintf(char *str, const char *format, ...) {
-    char str[256];
-    Spec_form spec_form;
-    init_struct(&spec_form);
+    char sym = 'c';
+    input_function(str, format, sym);
     return 0;
+}
+
+int input_function(char *str, const char *format, ...) {
+    int count = 0;
+    Spec_form spec_form;
+    while (*format != '\0') {
+        if (*format != '%') {
+            *str = *format;
+            str++;
+            format++;
+            count++;
+        } else {
+            format++;
+            if (*format == '%') {
+                *str = *format;
+                str++;
+                format++;
+                count++;
+            } else {
+                format = parsing_format(format, &spec_form);
+            }
+        }
+    }
+    return count;
+}
+
+const char *parsing_format(const char *format, Spec_form *spec_form) {
+    const char *ptr = format;
+    init_struct(spec_form);
+    ptr = parsing_flags(ptr, spec_form);
+    if (isdigit(*ptr) || *ptr == '*') {
+        ptr = parsing_width(ptr, spec_form);
+    }
+    if (*ptr == '.') {
+        ptr++;
+        ptr = parsing_prec(ptr, spec_form);
+    }
+    if (*ptr == 'h' || *ptr == 'l' || *ptr == 'L') {
+        ptr = parsing_length(ptr, spec_form);
+    }
+    if (*ptr != '\0') {
+        ptr = parsing_spec(ptr, spec_form);
+    } // TODO Разобраться с возможными ошибками
+    return ptr;
 }
 
 void init_struct(Spec_form *spec_form) {
@@ -44,30 +87,6 @@ void init_struct(Spec_form *spec_form) {
     spec_form->spec.p = false;
     spec_form->spec.n = false;
     spec_form->spec.percent = false;
-}
-
-int input_function(Spec_form *spec_form, char *str, const char *format, ...) {
-    int count = 0;
-    
-    while (*format != '\0') {
-        if (*format != '%') {
-            *str = *format;
-            str++;
-            format++;
-            count++;
-        } else {
-            format++;
-            if (*format == '%') {
-                *str = *format;
-                str++;
-                format++;
-                count++;
-            } else {
-                format = parsing_format(format, spec_form);
-            }
-        }
-    }
-    return count;
 }
 
 const char *parsing_flags(const char *ptr, Spec_form *spec_form) {
@@ -167,21 +186,10 @@ const char *parsing_spec(const char *ptr, Spec_form *spec_form) {
         spec_form->spec.p = true;
     } else if (*ptr == 'n') {
         spec_form->spec.n = true;
+    } else if (*ptr == '%') {
+        spec_form->spec.percent = true;
     } else {
         //TODO Написать ошибку и разобраться с ptr при ошибке
     }
     return ptr + 1;
-}
-
-const char *parsing_format(const char *format, Spec_form *spec_form) {
-    const char *ptr = format;
-    ptr = parsing_flags(ptr, spec_form);
-    ptr = parsing_width(ptr, spec_form);
-    if (*ptr == '.') {
-        ptr++;
-        ptr = parsing_prec(ptr, spec_form);
-    }
-    ptr = parsing_length(ptr, spec_form);
-    ptr = parsing_spec(ptr, spec_form);
-    return ptr;
 }
