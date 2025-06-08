@@ -123,14 +123,17 @@ const char *parsing_prec(const char *ptr, Spec_form *spec_form) {
 const char *parsing_length(const char *ptr, Spec_form *spec_form) {
     if (*ptr == 'h') {
         spec_form->length.h = true;
+        ptr++;
     } else if (*ptr == 'l') {
         spec_form->length.l = true;
+        ptr++;
     } else if (*ptr == 'L') {
         spec_form->length.L = true;
+        ptr++;
     } else {
         //TODO Написать ошибку
     }
-    return ptr + 1;
+    return ptr;
 }
 
 const char *parsing_spec(const char *ptr, Spec_form *spec_form) {
