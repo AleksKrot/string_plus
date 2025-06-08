@@ -1,0 +1,16 @@
+[33md598447[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{0}: reset: moving to HEAD@{1}
+[33md598447[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{1}: rebase (finish): returning to refs/heads/main
+[33md598447[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{2}: rebase: fast-forward
+[33mccb825d[m HEAD@{3}: rebase (start): checkout ccb825db952aae1e3fc2e811af1d2c931ebd4d99
+[33md598447[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{4}: rebase (finish): returning to refs/heads/main
+[33md598447[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{5}: rebase (start): checkout d598447597be86cbe98cbd9e38c841f943f30db5
+[33m0c0d86d[m HEAD@{6}: rebase (finish): returning to refs/heads/main
+[33m0c0d86d[m HEAD@{7}: rebase: fast-forward
+[33m34d3a04[m HEAD@{8}: rebase: fast-forward
+[33m529c693[m HEAD@{9}: rebase (start): checkout 529c6937c8016862450ba0b4f6a1e2974b8c43ef
+[33m0c0d86d[m HEAD@{10}: checkout: moving from develop to main
+[33md0e6d09[m[33m ([m[1;31morigin/feature/judsoncl[m[33m, [m[1;31morigin/develop[m[33m, [m[1;32mfeature/judsoncl[m[33m, [m[1;32mdevelop[m[33m)[m HEAD@{11}: checkout: moving from feature/judsoncl to develop
+[33md0e6d09[m[33m ([m[1;31morigin/feature/judsoncl[m[33m, [m[1;31morigin/develop[m[33m, [m[1;32mfeature/judsoncl[m[33m, [m[1;32mdevelop[m[33m)[m HEAD@{12}: checkout: moving from develop to feature/judsoncl
+[33md0e6d09[m[33m ([m[1;31morigin/feature/judsoncl[m[33m, [m[1;31morigin/develop[m[33m, [m[1;32mfeature/judsoncl[m[33m, [m[1;32mdevelop[m[33m)[m HEAD@{13}: commit: Set up initial files
+[33m0c0d86d[m HEAD@{14}: checkout: moving from main to develop
+[33m0c0d86d[m HEAD@{15}: clone: from github.com:AleksKrot/string_plus.git

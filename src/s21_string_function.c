@@ -135,3 +135,48 @@ char *s21_strpbrk(const char *str1, const char *str2) {
     }
     return result;
 }
+
+char *s21_strstr(const char *haystack, const char *needle) {
+    char *result = NULL;
+    if (*needle == '\0') {
+        result = (char *)haystack;
+    }
+    for (; *haystack != '\0'; haystack++) {
+        const char *h = haystack;
+        const char *n = needle;
+        while (*n != '\0' && *h != '\0' && *n == *h) {
+            n++;
+            h++;
+        }
+        if (*n == '\0') {
+            result = (char *)haystack;
+        }
+    }
+    return result;
+}
+
+char *s21_strtok(char *str, const char *delim) {
+    char *last = S21_NULL;
+    char *result = S21_NULL;
+    if (str != S21_NULL) {
+        last = str;
+    }
+    if (last == S21_NULL || *last == '\0') {
+        result = S21_NULL;
+    }
+    while (*last != '\0' && *last == *delim) {
+        last++;
+    }
+    if (*last == '\0') {
+        result = S21_NULL;
+    }
+    result = last;
+    while (*last != '\0' && *last != *delim) {
+        last++;
+    }
+    if (*last == *delim) {
+        *last = '\0';
+        last++;
+    }
+    return result;
+}

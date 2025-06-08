@@ -1,96 +1,118 @@
 #include "s21_string_function.h"
+#include "s21_sprintf.h"
 
-#include <stdbool.h>
+#include <stdio.h>
+#include <stdarg.h>
 
-// Структура для хранения флагов
-typedef struct {
-    bool minus;
-    bool plus;
-    bool space;
-    bool hashtag;
-    bool zero;
-} Flags;
+int s21_sprintf(char *str, const char *format, ...) {
+    char str[256];
+    int sym = 'c';
+    Spec_form spec_form;
+    init_struct(&spec_form);
+    return 0;
+}
 
-// Структура для хранения ширины
-typedef struct {
-    int number;
-    bool asterisk;
-} Width;
+void init_struct(Spec_form *spec_form) {
+    spec_form->flag.minus = false;
+    spec_form->flag.plus = false;
+    spec_form->flag.space = false;
+    spec_form->flag.hashtag = false;
+    spec_form->flag.zero = false;
 
-// Структура для хранения точности
-typedef struct {
-    int number;
-    bool asterisk;
-} Accur;
+    spec_form->width.number = 0;
+    spec_form->width.asterisk = false;
 
-// Структура для хранения длины
-typedef struct {
-    bool h;
-    bool l;
-    bool L;
-} Length;
+    spec_form->prec.number = 0;
+    spec_form->prec.asterisk = false;
 
-// Структура для хранения спецификаторов
-typedef struct {
-    bool c;
-    bool d;
-    bool i;
-    bool e;
-    bool E;
-    bool f;
-    bool g;
-    bool G;
-    bool o;
-    bool s;
-    bool u;
-    bool x;
-    bool X;
-    bool p;
-    bool n;
-    bool percent;
-} Spec;
+    spec_form->length.h = false;
+    spec_form->length.l = false;
+    spec_form->length.L = false;
 
-// Структура описывающая форматированный вывод
-typedef struct {
-    Flags flag;
-    Width width;
-    Accur accur;
-    Length length;
-    Spec spec;
-} Format;
+    spec_form->spec.c = false;
+    spec_form->spec.d = false;
+    spec_form->spec.i = false;
+    spec_form->spec.e = false;
+    spec_form->spec.E = false;
+    spec_form->spec.f = false;
+    spec_form->spec.g = false;
+    spec_form->spec.G = false;
+    spec_form->spec.o = false;
+    spec_form->spec.s = false;
+    spec_form->spec.u = false;
+    spec_form->spec.x = false;
+    spec_form->spec.X = false;
+    spec_form->spec.p = false;
+    spec_form->spec.n = false;
+    spec_form->spec.percent = false;
+}
 
+int input_function(Spec_form *spec_form, char *str, const char *format, ...) {
+    int count = 0;
+    
+    while (*format != '\0') {
+        if (*format != '%') {
+            *str = *format;
+            str++;
+            format++;
+            count++;
+        } else {
+            format++;
+            if (*format == '%') {
+                *str = *format;
+                str++;
+                format++;
+                count++;
+            } else {
+                format = parsing_flags(format, spec_form);
+                format = parsing_format(format, spec_form);
+            }
+        }
+    }
+}
 
-void init_struct(Format *format) {
-    format->flag.minus = false;
-    format->flag.plus = false;
-    format->flag.space = false;
-    format->flag.hashtag = false;
-    format->flag.zero = false;
+const char *parsing_flags(const char *ptr, Spec_form *spec_form) {
+    
+}
 
-    format->width.number = 0;
-    format->width.asterisk = false;
+const char *parsing_spec(const char *ptr, Spec_form *spec_form) {
+    if (*ptr == 'c') {
+        spec_form->spec.c = true;
+    } else if (*ptr == 'd') {
+        spec_form->spec.d = true;
+    } else if (*ptr == 'i') {
+        spec_form->spec.i = true;
+    } else if (*ptr == 'e') {
+        spec_form->spec.e = true;
+    } else if (*ptr == 'E') {
+        spec_form->spec.E = true;
+    } else if (*ptr == 'f') {
+        spec_form->spec.f = true;
+    } else if (*ptr == 'g') {
+        spec_form->spec.g = true;
+    } else if (*ptr == 'G') {
+        spec_form->spec.G = true;
+    } else if (*ptr == 'o') {
+        spec_form->spec.o = true;
+    } else if (*ptr == 's') {
+        spec_form->spec.s = true;
+    } else if (*ptr == 'u') {
+        spec_form->spec.u = true;
+    } else if (*ptr == 'x') {
+        spec_form->spec.x = true;
+    } else if (*ptr == 'X') {
+        spec_form->spec.X = true;
+    } else if (*ptr == 'p') {
+        spec_form->spec.p = true;
+    } else if (*ptr == 'n') {
+        spec_form->spec.n = true;
+    } else {
 
-    format->accur.number = 0;
-    format->accur.asterisk = false;
+    }
+    return ptr + 1;
+}
 
-    format->length.h = false;
-    format->length.l = false;
-    format->length.L = false;
-
-    format->spec.c = false;
-    format->spec.d = false;
-    format->spec.i = false;
-    format->spec.e = false;
-    format->spec.E = false;
-    format->spec.f = false;
-    format->spec.g = false;
-    format->spec.G = false;
-    format->spec.o = false;
-    format->spec.s = false;
-    format->spec.u = false;
-    format->spec.x = false;
-    format->spec.X = false;
-    format->spec.p = false;
-    format->spec.n = false;
-    format->spec.percent = false;
+const char *parsing_format(const char *format, Spec_form *spec_form) {
+    const char *ptr = format;
+    ptr = parsing_spec(ptr, spec_form);
 }
