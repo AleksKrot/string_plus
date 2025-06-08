@@ -168,7 +168,7 @@ const char *parsing_spec(const char *ptr, Spec_form *spec_form) {
     } else if (*ptr == 'n') {
         spec_form->spec.n = true;
     } else {
-        //TODO Написать ошибку
+        //TODO Написать ошибку и разобраться с ptr при ошибке
     }
     return ptr + 1;
 }
