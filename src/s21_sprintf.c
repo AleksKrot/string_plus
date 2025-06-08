@@ -198,16 +198,12 @@ const char *parsing_spec(const char *ptr, Spec_form *spec_form) {
 }
 
 void process_format(Spec_form *spec_form, va_list args, char **str, int *count) {
-    char temp[256] = {0};
+    char temp[256] = {0}; // TODO Динамическая память
     int len = 0;
 
     process_spec(spec_form, args, temp, &len);
-
-    /*if (spec_form->flag.minus || spec_form->flag.plus || spec_form->flag.space || spec_form->flag.hashtag || spec_form->flag.zero) {
-        process_flag(spec_form, &str, &count);
-    }*/
-
     // TODO Написать функции обрабтки формата
+
     for (int i = 0; i < len; i++) {
         **str = *(temp + i);
         (*str)++;
@@ -225,11 +221,36 @@ void process_spec(Spec_form *spec_form, va_list args, char *temp, int *len) {
         char c = va_arg(args, int);
         *(temp + *len) = c;
         (*len)++;
+    } else if (spec_form->spec.d) {
+        int d = va_arg(args, int);
+        char buffer[32] = {0}; // TODO Динамическая память
+        int pos = 0;
+        if (d < 0) {
+            *(buffer + pos) = '-';
+            pos++;
+            d = -d;
+        } else if (spec_form->flag.plus) {
+            spec_form->flag.space = false;
+            *(buffer + pos) = '+';
+            pos++;
+        } else if (spec_form->flag.space) {
+            *(buffer + pos) = ' ';
+        }
+        int start = pos;
+        do {
+            *(buffer + pos) = '0' + (d % 10);
+            d = d / 10;
+        } while (d > 0);
+        int j = pos - 1;
+        for (int i = start; i < j; i++) {
+            char tmp = *(buffer + i);
+            *(buffer + i) = *(buffer + j);
+            *(buffer + j) = tmp;
+            j--;
+        }
+        for (int i = 0; i < pos; i++) {
+            *(temp + *len) = *(buffer + i);
+            (*len)++;
+        }
     }
 }
-
-/*void process_flag(Spec_form *spec_form, char **str, int *count) {
-    if (spec_form->flag.minus) {
-
-    }
-}*/

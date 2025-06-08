@@ -93,7 +93,6 @@ void process_format(Spec_form *spec_form, va_list args, char **str, int *count);
 // Функция обработки спецификатора
 void process_spec(Spec_form *spec_form, va_list args, char *temp, int *len);
 
-// Функция обработки флагов
-//void process_flag(Spec_form *spec_form, char **str, int *count);
+
 
 #endif
