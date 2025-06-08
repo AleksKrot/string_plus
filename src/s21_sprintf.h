@@ -88,6 +88,12 @@ const char *parsing_spec(const char *ptr, Spec_form *spec_form);
 const char *parsing_format(const char *format, Spec_form *spec_form);
 
 // Функция обработки формата
-void process_format(Spec_form *spec_form, va_list args, char *str, int count);
+void process_format(Spec_form *spec_form, va_list args, char **str, int *count);
+
+// Функция обработки спецификатора
+void process_spec(Spec_form *spec_form, va_list args, char *temp, int *len);
+
+// Функция обработки флагов
+//void process_flag(Spec_form *spec_form, char **str, int *count);
 
 #endif
