@@ -97,10 +97,11 @@ const char *parsing_width(const char *ptr, Spec_form *spec_form) {
         }
     } else if (*ptr == '*') {
         spec_form->width.asterisk = true;
+        ptr++;
     } else {
         //TODO Написать ошибку
     }
-    return ptr + 1;
+    return ptr;
 }
 
 const char *parsing_prec(const char *ptr, Spec_form *spec_form) {
@@ -114,7 +115,7 @@ const char *parsing_prec(const char *ptr, Spec_form *spec_form) {
         spec_form->prec.asterisk = true;
         ptr++;
     } else {
-        //TODO Написать ошибку
+        //TODO Написать ошибку и рассмотреть случай отрицательной ширины
     }
     return ptr;
 }
