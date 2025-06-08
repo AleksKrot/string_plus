@@ -1,7 +1,10 @@
 #include "s21_string_function.h"
+#include "s21_sprintf.h"
+
 #include "s21_memchr_test.c"
 #include "s21_memcmp_test.c"
 #include "s21_memcpy_test.c"
+#include "s21_sprintf_test.c"
 
 #include <stdlib.h>
 
@@ -13,6 +16,7 @@ int main(void) {
         s21_memchr_suite,
         s21_memcmp_suite,
         s21_memcpy_suite,
+        s21_sprintf_suite,
         NULL
     };
 
