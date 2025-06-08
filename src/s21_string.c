@@ -1,6 +1,6 @@
-#include <stdio.h>
+#include "s21_string.h"
 
-#include "s21_string_function.h"
+#include <stdio.h>
 
 void *s21_memchr(const void *str, int c, size_t n) {
   const unsigned char *p = str;
@@ -74,6 +74,33 @@ int s21_strncmp(const char *str1, const char *str2, s21_size_t n) {
     }
   }
   return result;
+}
+
+char *s21_strncpy(char *dest, const char *src, s21_size_t n) {
+  if (dest && src) {
+    s21_size_t i;
+    for (i = 0; i < n && src[i] != '\0'; i++) {
+      dest[i] = src[i];
+    }
+    for (; i < n; i++) {
+      dest[i] = '\0';  // Дополняем оставшиеся символы нулями
+    }
+  }
+  return dest;  // Возвращаем dest (даже если NULL, как в стандартной strncpy)
+}
+
+s21_size_t s21_strcspn(const char *str1, const char *str2) {
+  s21_size_t len = 0;
+  s21_size_t i;
+  while (str1[len] != '\0') {
+    for (i = 0; str2[i] != '\0'; i++) {
+      if (str1[len] == str2[i]) {
+        return len;
+      }
+    }
+    len++;
+  }
+  return len;
 }
 
 size_t s21_strlen(const char *str) {
