@@ -25,7 +25,7 @@ test: s21_string.a
 gcov_report: test
 		gcovr $(GCOVR_FLAGS)
 
-clean: #TODO почитать как называется это место
+clean:
 		rm -f $(SRC_DIR)/s21_string_function $(SRC_DIR)/s21_string_test $(SRC_DIR)/*.o $(SRC_DIR)/*.a $(SRC_DIR)/*.gcda $(SRC_DIR)/*.gcno $(SRC_DIR)/*.html $(SRC_DIR)/*.css
 
 rebuild: clean all

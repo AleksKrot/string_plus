@@ -1,8 +1,7 @@
 #ifndef S21_STRING_FUNCTION_H  
 #define S21_STRING_FUNCTION_H
 //TODO переименовать файлы
-#define EXIT_FAILURE 1
-#define EXIT_SUCCESS 0
+
 #define S21_NULL ((void *)0)
 
 typedef unsigned long s21_size_t;

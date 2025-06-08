@@ -3,6 +3,8 @@
 #include "s21_memcmp_test.c"
 #include "s21_memcpy_test.c"
 
+#include <stdlib.h>
+
 int main(void) {
     int number_failed;
     int result;
