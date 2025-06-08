@@ -71,20 +71,21 @@ int input_function(Spec_form *spec_form, char *str, const char *format, ...) {
 }
 
 const char *parsing_flags(const char *ptr, Spec_form *spec_form) {
-    if (*ptr == '-') {
-        spec_form->flag.minus = true;
-    } else if (*ptr == '+') {
-        spec_form->flag.plus = true;
-    } else if (*ptr == ' ') {
-        spec_form->flag.space = true;
-    } else if (*ptr == '#') {
-        spec_form->flag.hashtag = true;
-    } else if (*ptr == '0') {
-        spec_form->flag.zero = true;
-    } else {
-        //TODO Написать ошибку
+    while (*ptr == '-' || *ptr == '+' || *ptr == ' ' || *ptr == '#' || *ptr == '0') {
+        if (*ptr == '-') {
+            spec_form->flag.minus = true;
+        } else if (*ptr == '+') {
+            spec_form->flag.plus = true;
+        } else if (*ptr == ' ') {
+            spec_form->flag.space = true;
+        } else if (*ptr == '#') {
+            spec_form->flag.hashtag = true;
+        } else if (*ptr == '0') {
+            spec_form->flag.zero = true;
+        } //TODO Написать ошибку
+        ptr++;
     }
-    return ptr +  1;
+    return ptr;
 }
 
 const char *parsing_width(const char *ptr, Spec_form *spec_form) {
@@ -111,10 +112,11 @@ const char *parsing_prec(const char *ptr, Spec_form *spec_form) {
         }
     } else if (*ptr == '*') {
         spec_form->prec.asterisk = true;
+        ptr++;
     } else {
         //TODO Написать ошибку
     }
-    return ptr + 1;
+    return ptr;
 }
 
 const char *parsing_length(const char *ptr, Spec_form *spec_form) {
@@ -170,9 +172,8 @@ const char *parsing_spec(const char *ptr, Spec_form *spec_form) {
 const char *parsing_format(const char *format, Spec_form *spec_form) {
     const char *ptr = format;
     ptr = parsing_flags(ptr, spec_form);
-    if (*ptr != '.') {
-        ptr = parsing_width(ptr, spec_form);
-    } else {
+    ptr = parsing_width(ptr, spec_form);
+    if (*ptr == '.') {
         ptr++;
         ptr = parsing_prec(ptr, spec_form);
     }
