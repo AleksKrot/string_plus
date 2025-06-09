@@ -1,5 +1,5 @@
 #include "s21_string.h"
-
+#include "stdlib.h"
 #include <stdio.h>
 
 void *s21_memchr(const void *str, int c, size_t n) {

@@ -1,7 +1,7 @@
 #include <check.h>
 #include <string.h>
 
-#include "s21_string_function.h"
+#include "s21_string.h"
 
 START_TEST(s21_memchr_basic_test) {
   const char *str = "Hello, World!";

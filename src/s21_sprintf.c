@@ -1,16 +1,19 @@
 #include "s21_sprintf.h"
+#include "s21_string.h"
 
 #include <stdarg.h>  // Предназначена для работы с функциями с переменным числом аргументов
 #include <stdio.h>
 
-#include "s21_string.h"
 
 int main() {
   Format format;
 
   char buffer[256];
-  int count = sprintf(buffer, "Hi, %c%s%d", 'A', "World", -100);
-  printf("%s\nCount = %d", buffer, count);
+  int count1 = s21_sprintf(buffer, "Integer: %d, Float: %.2f, String: %s", -42, 3.1415, "Hello");
+  printf("Buffer: %s\nCount = \n", buffer, count1);  // "Integer: -42, Float: 3.14, String: Hello"
+  
+  int count2 = s21_sprintf(buffer, "Unsigned: %u, Char: %c, %%", 123, 'A');
+  printf("Buffer: %s\nCount = \n", buffer, count2);  // "Unsigned: 123, Char: A, %"
 
   return 0;
 }
