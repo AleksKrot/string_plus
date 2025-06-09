@@ -64,11 +64,8 @@ typedef struct {
 // Функция для форматирования вывода в строку
 int s21_sprintf(char *str, const char *format, ...);
 
-// Функция ввода
-int input_function(char *str, const char *format, va_list args);
-
-// Инициализация структуры
-void init_struct(Spec_form *spec_form);
+// Парсер спецификатора формата
+const char *parsing_format(const char *format, Spec_form *spec_form);
 
 // Парсер флагов
 const char *parsing_flags(const char *ptr, Spec_form *spec_form);
@@ -85,14 +82,11 @@ const char *parsing_length(const char *ptr, Spec_form *spec_form);
 // Парсер спецификатора
 const char *parsing_spec(const char *ptr, Spec_form *spec_form);
 
-// Парсер спецификатора формата
-const char *parsing_format(const char *format, Spec_form *spec_form);
-
 // Функция обработки формата
-void process_format(Spec_form *spec_form, va_list args, char **str, int *count);
+void processing_format(Spec_form *spec_form, va_list args, char **str, int *count);
 
 // Функция обработки спецификатора
-void process_spec(Spec_form *spec_form, va_list args, char *temp, int *len);
+void process_spec(Spec_form *spec_form, va_list args);
 
 
 

@@ -7,14 +7,10 @@
 int s21_sprintf(char *str, const char *format, ...) {
     va_list args;
     va_start(args, format);
-    int count = input_function(str, format, args); // TODO Разобраться с count
-    va_end(args);
-    return count;
-}
-
-int input_function(char *str, const char *format, va_list args) {
+    
     int count = 0;
-    Spec_form spec_form;
+    Spec_form spec_form = {0};
+    
     while (*format != '\0') {
         if (*format != '%') {
             *str = *format;
@@ -29,11 +25,13 @@ int input_function(char *str, const char *format, va_list args) {
                 format++;
                 count++;
             } else {
-                format = parsing_format(format, &spec_form);
-                process_format(&spec_form, args, &str, &count);
+                parsing_format(&format, &spec_form);
+                processing_format(&spec_form, args);
             }
         }
     }
+
+    va_end(args);
     return count;
 }
 
@@ -55,41 +53,6 @@ const char *parsing_format(const char *format, Spec_form *spec_form) {
         ptr = parsing_spec(ptr, spec_form);
     } // TODO Разобраться с возможными ошибками
     return ptr;
-}
-
-void init_struct(Spec_form *spec_form) { // TODO Рассмотреть возможность сокращения за счет составного литерата
-    spec_form->flag.minus = false;
-    spec_form->flag.plus = false;
-    spec_form->flag.space = false;
-    spec_form->flag.hashtag = false;
-    spec_form->flag.zero = false;
-
-    spec_form->width.number = 0;
-    spec_form->width.asterisk = false;
-
-    spec_form->prec.number = 0;
-    spec_form->prec.asterisk = false;
-
-    spec_form->length.h = false;
-    spec_form->length.l = false;
-    spec_form->length.L = false;
-
-    spec_form->spec.c = false;
-    spec_form->spec.d = false;
-    spec_form->spec.i = false;
-    spec_form->spec.e = false;
-    spec_form->spec.E = false;
-    spec_form->spec.f = false;
-    spec_form->spec.g = false;
-    spec_form->spec.G = false;
-    spec_form->spec.o = false;
-    spec_form->spec.s = false;
-    spec_form->spec.u = false;
-    spec_form->spec.x = false;
-    spec_form->spec.X = false;
-    spec_form->spec.p = false;
-    spec_form->spec.n = false;
-    spec_form->spec.percent = false;
 }
 
 const char *parsing_flags(const char *ptr, Spec_form *spec_form) {
@@ -197,18 +160,12 @@ const char *parsing_spec(const char *ptr, Spec_form *spec_form) {
     return ptr + 1;
 }
 
-void process_format(Spec_form *spec_form, va_list args, char **str, int *count) {
+void processing_format(Spec_form *spec_form, va_list args) {
     char temp[256] = {0}; // TODO Динамическая память
     int len = 0;
 
     process_spec(spec_form, args, temp, &len);
     // TODO Написать функции обрабтки формата
-
-    for (int i = 0; i < len; i++) {
-        **str = *(temp + i);
-        (*str)++;
-        (*count)++;
-    }
 }
 
 void process_spec(Spec_form *spec_form, va_list args, char *temp, int *len) {
@@ -218,9 +175,32 @@ void process_spec(Spec_form *spec_form, va_list args, char *temp, int *len) {
         spec_form->prec.number = 0;
         spec_form->length.h = false;
         spec_form->length.l = false;
+        
         char c = va_arg(args, int);
-        *(temp + *len) = c;
-        (*len)++;
+
+        int width = spec_form->width.number;
+
+        if (width <= 1) {
+            *(temp + *len) = c;
+            (*len)++;
+        } else {
+            if (spec_form->flag.minus) {
+                *(temp + *len) = c;
+                (*len)++;
+                for (int i = 1; i < width; i++) {
+                    *(temp + *len) = ' ';
+                    (*len)++;
+                }
+            } else {
+                for (int i = 1; i < width; i++) {
+                    *(temp + *len) = ' ';
+                    (*len)++;
+                }
+                *(temp + *len) = c;
+                (*len)++;
+            }
+        }
+                
     } else if (spec_form->spec.d) {
         int d = va_arg(args, int);
         char buffer[32] = {0}; // TODO Динамическая память
