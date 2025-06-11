@@ -4,9 +4,43 @@
 #include <string.h>
 #include <stdio.h>
 
+// Копирование всей строки
 START_TEST(s21_memcpy_basic_test) {
     const char *s = "Hello, World!";
     s21_size_t n = s21_strlen(s);
+    char d[n];
+    void *result = s21_memcpy(d, s, n);
+    ck_assert_ptr_eq(result, memcpy(d, s, n));
+    ck_assert_mem_eq(d, s, n);
+}
+END_TEST
+
+// Копирование части строки
+START_TEST(s21_memcpy_partial_test) {
+    const char *s = "Hello, World!";
+    s21_size_t n = 5;
+    char d[n];
+    void *result = s21_memcpy(d, s, n);
+    ck_assert_ptr_eq(result, memcpy(d, s, n));
+    ck_assert_mem_eq(d, s, n);
+}
+END_TEST
+
+// Копирование нулевого размера
+START_TEST(s21_memcpy_zero_size_test) {
+    const char *s = "Hello, World!";
+    s21_size_t n = 0;
+    char d[n];
+    void *result = s21_memcpy(d, s, n);
+    ck_assert_ptr_eq(result, memcpy(d, s, n));
+    ck_assert_mem_eq(d, s, n);
+}
+END_TEST
+
+// Копирование большего размера
+START_TEST(s21_memcpy_over_size_test) {
+    const char *s = "Hello, World!";
+    s21_size_t n = s21_strlen(s) + 2;
     char d[n];
     void *result = s21_memcpy(d, s, n);
     ck_assert_ptr_eq(result, memcpy(d, s, n));
@@ -19,6 +53,9 @@ Suite *s21_memcpy_suite(void) {
     TCase *tc = tcase_create("Core");
 
     tcase_add_test(tc, s21_memcpy_basic_test);
+    tcase_add_test(tc, s21_memcpy_partial_test);
+    tcase_add_test(tc, s21_memcpy_zero_size_test);
+    tcase_add_test(tc, s21_memcpy_over_size_test);
 
     suite_add_tcase(s, tc);
     
