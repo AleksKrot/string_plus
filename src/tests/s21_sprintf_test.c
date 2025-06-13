@@ -1,7 +1,7 @@
 #include "s21_string_test.h"
 
 START_TEST(s21_sprintf_basic_test) {
-    char buffer[50]; // TODO Динамическая память
+    char buffer[50];
     char buffer_2[50];
     const char *str = "Hello, 50%%, %-5n%% World! ";
     char arg = 'c';
