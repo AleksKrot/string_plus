@@ -14,6 +14,7 @@ int main(void) {
         s21_sprintf_suite,
         s21_strrchr_suite,
         s21_strncmp_suite,
+        s21_strncpy_suite,
         S21_NULL
     };
 
