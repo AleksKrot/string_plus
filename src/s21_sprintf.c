@@ -25,8 +25,9 @@ int s21_sprintf(char *str, const char *format, ...) {
                 format++;
                 count++;
             } else {
-                parsing_format(&format, &spec_form);
+                format = parsing_format(format, &spec_form);
                 processing_format(&spec_form, args);
+                //writing_output();
             }
         }
     }
@@ -37,7 +38,6 @@ int s21_sprintf(char *str, const char *format, ...) {
 
 const char *parsing_format(const char *format, Spec_form *spec_form) {
     const char *ptr = format;
-    init_struct(spec_form);
     ptr = parsing_flags(ptr, spec_form);
     if (isdigit(*ptr) || *ptr == '*') {
         ptr = parsing_width(ptr, spec_form);

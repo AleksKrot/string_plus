@@ -1,7 +1,4 @@
-#include "s21_string.h"
-
-#include <check.h>
-#include <string.h>
+#include "s21_string_test.h"
 
 // Символ найден
 START_TEST(s21_memchr_basic_test) {

@@ -1,8 +1,4 @@
-#include "s21_string.h"
-
-#include <check.h>
-#include <string.h>
-#include <stdio.h>
+#include "s21_string_test.h"
 
 // Копирование всей строки
 START_TEST(s21_memcpy_basic_test) {
