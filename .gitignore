@@ -53,3 +53,4 @@ dkms.conf
 /.idea/
 /CMakeLists.txt
 /src/tests/*.gcno
+/src/tests/s21_string_test
