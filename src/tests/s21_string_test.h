@@ -18,6 +18,7 @@ Suite *s21_strrchr_suite(void);
 Suite *s21_strncat_suite(void);
 Suite *s21_strncmp_suite(void);
 Suite *s21_strncpy_suite(void);
+Suite *s21_strcspn_suite(void);
 Suite *s21_sprintf_suite(void);
 
 #endif

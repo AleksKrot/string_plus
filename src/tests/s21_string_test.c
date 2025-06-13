@@ -15,12 +15,13 @@ int main(void) {
         s21_strrchr_suite,
         s21_strncmp_suite,
         s21_strncpy_suite,
+        s21_strcspn_suite,
         S21_NULL
     };
 
-    SRunner *sr = srunner_create(NULL);
+    SRunner *sr = srunner_create(S21_NULL);
     
-    for (int i = 0; *(test_suites + i) != NULL; i++) {
+    for (int i = 0; *(test_suites + i) != S21_NULL; i++) {
         Suite *s = test_suites[i]();
         srunner_add_suite(sr, s);
     }
