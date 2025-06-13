@@ -40,7 +40,7 @@ START_TEST(s21_strncat_zero_n_test) {
 END_TEST
 
 Suite *s21_strncat_suite(void) {
-    Suite *s = suite_create("s21_memset");
+    Suite *s = suite_create("s21_strncat");
     TCase *tc = tcase_create("Core");
 
     tcase_add_test(tc, s21_strncat_basic_test);
