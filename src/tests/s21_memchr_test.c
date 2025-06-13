@@ -66,7 +66,7 @@ START_TEST(s21_memchr_null_test) {
 }
 END_TEST
 
-// Cимвол есть, но за пределами n
+// Символ есть, но за пределами n
 START_TEST(s21_memchr_limited_test) {
     const char *str = "Hello, World!";
     char c = 'W';
