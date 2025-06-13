@@ -5,6 +5,7 @@
 void *s21_memchr(const void *str, int c, s21_size_t n) {
     void *result = S21_NULL;
     const unsigned char *s = str;
+    
     for (s21_size_t i = 0; i < n && result == S21_NULL; i++) {
         if (*(s + i) == (unsigned char)c) {
             result = (void *)(s + i);
@@ -29,6 +30,7 @@ int s21_memcmp(const void *str1, const void *str2, s21_size_t n) {
 void *s21_memcpy(void *dest, const void *src, s21_size_t n) {
     char *d = dest;
     const char *s = src;
+    
     for (s21_size_t i = 0; i < n; i++) {
         *(d + i) = *(s + i);
     }
@@ -37,6 +39,7 @@ void *s21_memcpy(void *dest, const void *src, s21_size_t n) {
 
 void *s21_memset(void *str, int c, s21_size_t n) {
     char *s = str;
+    
     for (s21_size_t i = 0; i < n; i++) {
         *(s + i) = (unsigned char)c;
     }
@@ -56,6 +59,7 @@ char *s21_strncat(char *dest, const char *src, s21_size_t n) {
     char *d = dest;
     char *d_finish = d + s21_strlen(d);
     const char *s = src;
+    
     for (s21_size_t i = 0; i < n; i++) {
         *(d_finish + i) = *(s + i);
     }
@@ -66,6 +70,7 @@ char *s21_strchr(const char *str, int c) {
     const char *s = str;
     void *result = NULL;
     int i = 0;
+    
     while (*(s + i) != '\0' && result == NULL) {
         if (*(s + i) == (unsigned char)c) {
             result = (void *)(s + i);

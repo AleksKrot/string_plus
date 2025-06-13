@@ -1,7 +1,4 @@
-#include "s21_string.h"
-
-#include <check.h>
-#include <string.h>
+#include "s21_string_test.h"
 
 // Одинаковые массивы
 START_TEST(s21_memcmp_basic_test) {

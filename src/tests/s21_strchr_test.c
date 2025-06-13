@@ -1,8 +1,4 @@
-#include "s21_string.h"
-
-#include <check.h>
-#include <string.h>
-#include <stdio.h>
+#include "s21_string_test.h"
 
 // Заполнение всего буфера
 START_TEST(s21_strchr_basic_test) {

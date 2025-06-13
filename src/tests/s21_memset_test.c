@@ -1,8 +1,4 @@
-#include "s21_string.h"
-
-#include <check.h>
-#include <string.h>
-#include <stdio.h>
+#include "s21_string_test.h"
 
 // Заполнение нулями
 START_TEST(s21_memset_basic_test) {

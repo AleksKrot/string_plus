@@ -1,12 +1,4 @@
-#include "s21_string.h"
-#include "s21_sprintf.h"
-
-#include "s21_memchr_test.c"
-#include "s21_memcmp_test.c"
-#include "s21_memcpy_test.c"
-#include "s21_sprintf_test.c"
-
-#include <stdlib.h>
+#include "s21_string_test.h"
 
 int main(void) {
     int number_failed;
@@ -16,8 +8,11 @@ int main(void) {
         s21_memchr_suite,
         s21_memcmp_suite,
         s21_memcpy_suite,
+        s21_memset_suite,
+        s21_strncat_suite,
+        s21_strchr_suite,
         s21_sprintf_suite,
-        NULL
+        S21_NULL
     };
 
     SRunner *sr = srunner_create(NULL);
@@ -27,7 +22,7 @@ int main(void) {
         srunner_add_suite(sr, s);
     }
     
-    srunner_run_all(sr, CK_NORMAL);
+    srunner_run_all(sr, CK_VERBOSE);
     number_failed = srunner_ntests_failed(sr);
     srunner_free(sr);
 

@@ -83,10 +83,10 @@ const char *parsing_length(const char *ptr, Spec_form *spec_form);
 const char *parsing_spec(const char *ptr, Spec_form *spec_form);
 
 // Функция обработки формата
-void processing_format(Spec_form *spec_form, va_list args, char **str, int *count);
+void processing_format(Spec_form *spec_form, va_list args);
 
 // Функция обработки спецификатора
-void process_spec(Spec_form *spec_form, va_list args);
+void process_spec(Spec_form *spec_form, va_list args, char *temp, int *len);
 
 
 
