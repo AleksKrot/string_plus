@@ -1,6 +1,5 @@
 #include "s21_string.h"
 
-#include <stdio.h>
 
 void *s21_memchr(const void *str, int c, s21_size_t n) {
     void *result = S21_NULL;
@@ -41,7 +40,7 @@ void *s21_memcpy(void *dest, const void *src, s21_size_t n) {
 }
 
 void *s21_memset(void *str, int c, s21_size_t n) {
-    char *s = str;
+    unsigned char *s = str;
     
     for (s21_size_t i = 0; i < n; i++) {
         *(s + i) = (unsigned char)c;
