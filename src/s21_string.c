@@ -172,20 +172,24 @@ char *s21_strpbrk(const char *str1, const char *str2) {
 
 char *s21_strstr(const char *haystack, const char *needle) {
     char *result = S21_NULL;
+
     if (*needle == '\0') {
         result = (char *)haystack;
     }
-    for (; *haystack != '\0'; haystack++) {
+
+    while (*haystack != '\0' && result == S21_NULL) {
         const char *h = haystack;
         const char *n = needle;
-        while (*n != '\0' && *h != '\0' && *n == *h) {
+        while (*n != '\0' && *h == *n) {
             n++;
             h++;
         }
         if (*n == '\0') {
-            result = (char *)haystack;
+            result = (char *) haystack;
         }
+        haystack++;
     }
+
     return result;
 }
 
