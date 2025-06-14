@@ -16,6 +16,7 @@ int main(void) {
         s21_strncmp_suite,
         s21_strncpy_suite,
         s21_strcspn_suite,
+        s21_strlen_suite,
         S21_NULL
     };
 

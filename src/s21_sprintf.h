@@ -61,9 +61,6 @@ typedef struct {
     Spec spec;
 } Spec_form;
 
-// Функция для форматирования вывода в строку
-int s21_sprintf(char *str, const char *format, ...);
-
 // Парсер спецификатора формата
 const char *parsing_format(const char *format, Spec_form *spec_form);
 
