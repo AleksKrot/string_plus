@@ -18,6 +18,7 @@ int main(void) {
         s21_strcspn_suite,
         s21_strlen_suite,
         s21_strpbrk_suite,
+        s21_strstr_suite,
         S21_NULL
     };
 
@@ -28,7 +29,7 @@ int main(void) {
         srunner_add_suite(sr, s);
     }
     
-    srunner_run_all(sr, CK_VERBOSE);
+    srunner_run_all(sr, CK_NORMAL);
     number_failed = srunner_ntests_failed(sr);
     srunner_free(sr);
 
