@@ -22,6 +22,7 @@ Suite *s21_strcspn_suite(void);
 Suite *s21_strlen_suite(void);
 Suite *s21_strpbrk_suite(void);
 Suite *s21_strstr_suite(void);
+Suite *s21_strtok_suite(void);
 Suite *s21_sprintf_suite(void);
 
 #endif
