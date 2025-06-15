@@ -194,27 +194,43 @@ char *s21_strstr(const char *haystack, const char *needle) {
 }
 
 char *s21_strtok(char *str, const char *delim) {
-    char *last = S21_NULL;
+    static char *s = S21_NULL;
     char *result = S21_NULL;
+    int is_start_token = 0;
+    int is_delim = 0;
+
+    if (delim == S21_NULL || s21_strlen(delim) == 0) {
+        return str; // TODO дурацкая ненужная, избавиться от нее
+    }
+
     if (str != S21_NULL) {
-        last = str;
+        s = str;
     }
-    if (last == S21_NULL || *last == '\0') {
-        result = S21_NULL;
-    }
-    while (*last != '\0' && *last == *delim) {
-        last++;
-    }
-    if (*last == '\0') {
-        result = S21_NULL;
-    }
-    result = last;
-    while (*last != '\0' && *last != *delim) {
-        last++;
-    }
-    if (*last == *delim) {
-        *last = '\0';
-        last++;
+    if (s != S21_NULL && s21_strlen(s) != 0) {
+        s21_size_t len_s = s21_strlen(s);
+        s21_size_t len_delim = s21_strlen(delim);
+        for (s21_size_t i = 0; i < len_s; i++) {
+            is_delim = 0;
+            for (s21_size_t j = 0; j < len_delim && is_delim == 0; j++) {
+                if (*(s + i) == *(delim + j)) {
+                    is_delim = 1;
+                }
+            }
+            if (!is_delim && !is_start_token) {
+                is_start_token = 1;
+                result = s + i;
+            } else if (is_delim && is_start_token) {
+                if (str != S21_NULL) {
+                    *(str + i) = '\0';
+                } else {
+                    *(s + i) = '\0';
+                }
+                s = (s + i + 1);
+                break; // TODO дурацкая ненужная, избавиться от нее
+            }
+        }
+    } else {
+        return S21_NULL;
     }
     return result;
 }
