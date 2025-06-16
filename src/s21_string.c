@@ -164,15 +164,6 @@ char *s21_strstr(const char *haystack, const char *needle) {
   return S21_NULL;
 }
 
-// Функция для извлечения токенов из строки
-char *s21_strtok(char *str, const char *delim){
-  static char* last;
-  if (*str != S21_NULL) {
-    last = str;
-  } else if (last == S21_NULL)
-    return S21_NULL;
-}
-
 void *insert(const char *src, const char *str, s21_size_t start_index) {
   if (!src || !str) return S21_NULL;
   char *result = S21_NULL;
@@ -227,4 +218,35 @@ void *trim(const char *src, const char *trim_chars) {
     result[trail_char] = '\0';
   }
   return (void *)result;
+
+char *s21_strtok(char *str, const char *delim) {
+  static char *last;
+
+  if (str != S21_NULL) {
+    last = str;
+  } else if (last == S21_NULL) {
+    return S21_NULL;
+  }
+
+  // Пропуск начальных разделителей
+  while (*last && s21_strchr(delim, *last)) {
+    last++;
+  }
+
+  if (*last == '\0') return S21_NULL;
+
+  char *token_start = last;
+
+  // Идём до следующего разделителя или конца строки
+  while (*last && s21_strchr(delim, *last) == S21_NULL) {
+    last++;
+  }
+
+  if (*last) {
+    *last = '\0';  // завершение текущего токена
+    last++;        // указатель сдвигаем на следующий символ
+  }
+
+  return token_start;
+
 }
