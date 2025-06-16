@@ -3,6 +3,9 @@
 
 #define S21_NULL ((void *)0)
 
+#include <stdlib.h>
+#include "s21_sprintf.h"
+
 typedef unsigned long s21_size_t;
 
 // Функция для поиска первого вхождения символа в памяти

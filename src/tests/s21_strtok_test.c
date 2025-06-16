@@ -43,7 +43,7 @@ END_TEST
 START_TEST(s21_strtok_null_both_test) {
     char s1[] = "";
     char s2[] = "";
-    const char *d = " ,!";
+    const char *d = "";
     char *result = s21_strtok(s1, d);
     ck_assert_pstr_eq(result, strtok(s2, d));
 
@@ -60,7 +60,6 @@ Suite *s21_strtok_suite(void) {
     tcase_add_test(tc, s21_strtok_null_delim_test);
     tcase_add_test(tc, s21_strtok_null_str_test);
     tcase_add_test(tc, s21_strtok_null_both_test);
-
 
     suite_add_tcase(s, tc);
 

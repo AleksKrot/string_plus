@@ -200,9 +200,12 @@ char *s21_strtok(char *str, const char *delim) {
     int is_delim = 0;
 
     if (delim == S21_NULL || s21_strlen(delim) == 0) {
-        return str; // TODO дурацкая ненужная, избавиться от нее
+        if (str == S21_NULL || s21_strlen(str) == 0) {
+            return S21_NULL;
+        } else {
+            return str;
+        }
     }
-
     if (str != S21_NULL) {
         s = str;
     }
@@ -226,11 +229,11 @@ char *s21_strtok(char *str, const char *delim) {
                     *(s + i) = '\0';
                 }
                 s = (s + i + 1);
-                break; // TODO дурацкая ненужная, избавиться от нее
+                break;
             }
         }
     } else {
-        return S21_NULL;
+        result = S21_NULL;
     }
     return result;
 }

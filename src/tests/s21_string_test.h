@@ -2,7 +2,6 @@
 #define S21_STRING_TEST_H
 
 #include "s21_string.h"
-#include "s21_sprintf.h"
 
 #include <check.h>
 #include <string.h>
