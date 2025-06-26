@@ -10,70 +10,6 @@
 
 #include "s21_string.h"
 
-// int main() {
-//   Format format;
-//   init_format(&format);
-
-//   char buffer[256];
-
-//   // Тесты для %s
-//   s21_sprintf(buffer, "|%s|", "hello");  // |hello|
-//   printf("%s\n", buffer);
-
-//   s21_sprintf(buffer, "|%10s|", "hello");  // |     hello|
-//   printf("%s\n", buffer);
-
-//   s21_sprintf(buffer, "|%-10s|", "hello");  // |hello     |
-//   printf("%s\n", buffer);
-
-//   s21_sprintf(buffer, "|%010s|", "hello");  // |00000hello|
-//   printf("%s\n", buffer);
-
-//   s21_sprintf(buffer, "|%10.3s|", "hello");  // |       hel|
-//   printf("%s\n", buffer);
-
-//   s21_sprintf(buffer, "|%-10.3s|", "hello");  // |hel       |
-//   printf("%s\n", buffer);
-
-//   s21_sprintf(buffer, "|%010.3s|", "hello");  // |0000000hel|
-//   printf("%s\n", buffer);
-
-//   // Тесты для %d с флагом 0
-//   s21_sprintf(buffer, "|%05d|", 123);  // |00123|
-//   printf("%s\n", buffer);
-
-//   s21_sprintf(buffer, "|%05d|", -123);  // |-0123|
-//   printf("%s\n", buffer);
-
-//   s21_sprintf(buffer, "|%8.5d|", 123);  // |   00123|
-//   printf("%s\n", buffer);
-
-//   s21_sprintf(buffer, "|%08.5d|",
-//               123);  // |   00123| (флаг 0 игнорируется при наличии точности)
-//   printf("%s\n", buffer);
-
-//   // Тесты для %f с флагом 0
-//   s21_sprintf(buffer, "|%010f|", 3.1415);  // |003.141500|
-//   printf("%s\n", buffer);
-
-//   s21_sprintf(buffer, "|%010.2f|",
-//               3.1415);  // |000003.14| (флаг 0 игнорируется)
-//   printf("%s\n", buffer);
-
-//   // Тесты для %u
-//   s21_sprintf(buffer, "|%u|", 123);  // |123|
-//   printf("%s\n", buffer);
-
-//   s21_sprintf(buffer, "|%05u|", 123);  // |00123|
-//   printf("%s\n", buffer);
-
-//   // Тест для %%
-//   s21_sprintf(buffer, "|%%|");  // |%|
-//   printf("%s\n", buffer);
-
-//   return 0;
-// }
-
 int s21_sprintf(char *str, const char *format, ...) {
   va_list args;
   va_start(args, format);
@@ -405,7 +341,21 @@ void process_format(Format *format, va_list args, char **buffer) {
     }
   } else if (format->spec.percent) {
     // Обработка %%
-    *ptr++ = '%';
+    int width = format->width.number > 0 ? format->width.number : 1;
+
+    if (format->flags.minus) {
+      // Выравнивание влево: % + пробелы
+      *ptr++ = '%';
+      for (int i = 1; i < width; i++) {
+        *ptr++ = ' ';
+      }
+    } else {
+      // Выравнивание вправо: пробелы + %
+      for (int i = 1; i < width; i++) {
+        *ptr++ = ' ';
+      }
+      *ptr++ = '%';
+    }
   }
 
   // Копирование в выходной буфер
