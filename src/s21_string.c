@@ -1,6 +1,8 @@
 #include "s21_string.h"
-#include "stdlib.h"
+
 #include <stdio.h>
+
+#include "stdlib.h"
 
 void *s21_memchr(const void *str, int c, size_t n) {
   const unsigned char *p = str;
@@ -184,4 +186,28 @@ void *s21_insert(const char *src, const char *str, size_t start_index) {
     }
   }
   return result;
+}
+
+// Вспомогательная функция для копирования памяти
+void *s21_memmove(void *dest, const void *src, s21_size_t n) {
+  char *d = dest;
+  const char *s = src;
+
+  if (d < s) {
+    for (s21_size_t i = 0; i < n; i++) {
+      d[i] = s[i];
+    }
+  } else {
+    for (s21_size_t i = n; i > 0; i--) {
+      d[i - 1] = s[i - 1];
+    }
+  }
+  return dest;
+}
+
+// Вспомогательная функция для копирования строки
+char *s21_strcpy(char *dest, const char *src) {
+  char *d = dest;
+  while ((*d++ = *src++));
+  return dest;
 }

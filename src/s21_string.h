@@ -74,4 +74,10 @@ void *s21_insert(const char *src, const char *str, s21_size_t start_index);
 // Функция для удаления всех начальных и конечных вхождений символов из строки
 void *s21_trim(const char *src, const char *trim_chars);
 
+// Вспомогательная функция для копирования памяти
+void *s21_memmove(void *dest, const void *src, s21_size_t n);
+
+// Вспомогательная функция для копирования строки
+char *s21_strcpy(char *dest, const char *src);
+
 #endif

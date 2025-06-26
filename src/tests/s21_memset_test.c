@@ -109,7 +109,7 @@ START_TEST(test_memset_non_ascii) {  // Проверяет работу с не-
   s21_memset(str1, c, n);
   memset(str2, c, n);
 
-  ck_assert_int_eq(compare_memory(str1, str2, 20), 0);
+  ck_assert_int_eq(compare_memory(str1, str2, 20), 0); // Макрос для проверки равенства двух целых чисел в модульных тестах
 }
 END_TEST
 

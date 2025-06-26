@@ -1,31 +1,44 @@
+# Упрощенный и надежный Makefile
+
+# Компилятор и флаги
 CC = gcc
 CFLAGS = -Wall -Werror -Wextra -std=c11 -pedantic
-TEST_FLAGS = -lcheck -lm -lsubunit
-GCOV_FLAGS = -fprofile-arcs -ftest-coverage
-GCOVR_FLAGS = --txt-metric branch --html --html-details -o gcov_report.html
 
-SRC_DIR = .
+# Имена целевых файлов
+TARGET = s21_sprintf
+TEST_TARGET = test_sprintf
 
-.PHONY: all install test gcov_report clean rebuild
+# Исходные файлы
+SRC = s21_sprintf.c s21_string.c
+TEST_SRC = test_sprintf.c
 
-all: s21_string.a test gcov_report
+# Объектные файлы
+OBJ = $(SRC:.c=.o)
+TEST_OBJ = $(TEST_SRC:.c=.o)
 
-install:
-		sudo apt-get update && sudo apt-get install check
-		sudo apt-get install gcovr
+# Основная цель
+all: $(TARGET)
 
-s21_string.a:
-		$(CC) $(CFLAGS) -c $(SRC_DIR)/s21_string_function.c -o $(SRC_DIR)/s21_string_function.o
-		ar rcs $(SRC_DIR)/s21_string.a $(SRC_DIR)/s21_string_function.o
+# Сборка основной программы
+$(TARGET): $(OBJ)
+	$(CC) $(CFLAGS) $^ -o $@
 
-test: s21_string.a
-		$(CC) $(CFLAGS) $(GCOV_FLAGS) $(SRC_DIR)/s21_string_test.c $(SRC_DIR)/s21_string.a -o $(SRC_DIR)/s21_string_test $(TEST_FLAGS)
-		$(SRC_DIR)/s21_string_test
+# Сборка тестов
+test: $(TEST_TARGET)
+	./$(TEST_TARGET)
 
-gcov_report: test
-		gcovr $(GCOVR_FLAGS)
+$(TEST_TARGET): $(OBJ) $(TEST_OBJ)
+	$(CC) $(CFLAGS) $^ -o $@
 
+# Правило для компиляции .c файлов
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Очистка
 clean:
-		rm -f $(SRC_DIR)/s21_string_function $(SRC_DIR)/s21_string_test $(SRC_DIR)/*.o $(SRC_DIR)/*.a $(SRC_DIR)/*.gcda $(SRC_DIR)/*.gcno $(SRC_DIR)/*.html $(SRC_DIR)/*.css
+	rm -f *.o $(TARGET) $(TEST_TARGET)
 
+# Пересборка
 rebuild: clean all
+
+.PHONY: all test clean rebuild

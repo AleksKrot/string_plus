@@ -4,56 +4,42 @@
 #include <stdarg.h>
 #include <stdbool.h>
 
-// Структура для хранения флагов
+// Структура для хранения флагов формата
 typedef struct {
   bool minus;  // Флаг выравнивания по левому краю
   bool plus;  // Флаг обязательного отображения знака +
   bool space;  // Флаг отображения пробела вместо знака +
-  bool hashtag;
-  bool zero;  // Флаг дополняет число слева нулями (0) вместо пробелов
+  bool zero;
 } Flags;
 
-// Структура для хранения ширины
+// Структура для хранения информации о ширине
 typedef struct {
-  int number;     // Числовое значение ширины
-  bool asterisk;  // '*'
+  int number;  // Числовое значение ширины
 } Width;
 
-// Структура для хранения точности
+// Структура для хранения информации о точности
 typedef struct {
   int number;     // Числовое значение точности
-  bool asterisk;  // '*'
+  bool explicit;  // Была ли точность указана явно
 } Precision;
 
 // Структура для хранения модификаторов длины
 typedef struct {
   bool h;  // Модификатор short
   bool l;  // Модификатор long
-  bool L;  // Модификатор long double
 } Length;
 
-// Структура для хранения спецификаторов
+// Структура для хранения информации о спецификаторах
 typedef struct {
-  bool c;  // Символ
-  bool d;  // Целое число со знаком
-  bool i;  // Целое число со знаком
-  bool e;  // Вывод числа в научном формате с маленькой буквой e
-  bool E;  // Вывод числа в научном формате с заглавной буквой E
-  bool f;  // Число с плавающей точкой
-  bool g;  // Вывод чисел с плавающей точкой в компактном формате
-  bool G;  // Вывод чисел с плавающей точкой в компактном формате
-  bool o;  // Целое число в восьмеричном формате
-  bool s;  // Строка
-  bool u;  // Целое число без знака
-  bool x;  // Целое число без знака в шестнадцатеричном формате с маленькими
-           // буквами a–f
-  bool X;  // Целое число без знака в шестнадцатеричном формате с заглавными
-           // буквами A–F
-  bool p;  // Вывод указателей
-  bool n;  // Запись количества уже выведенных символов в переменную
+  bool c;        // Символ
+  bool d;        // Целое число со знаком
+  bool f;        // Число с плавающей точкой
+  bool s;        // Строка
+  bool u;        // Целое число без знака
   bool percent;  // Символ процента
 } Specifier;
 
+// Основная структура для хранения всей информации о формате
 typedef struct {
   Flags flags;          // Флаги формата
   Width width;          // Ширина поля
@@ -62,13 +48,44 @@ typedef struct {
   Specifier spec;       // Спецификаторы
 } Format;
 
-// Функция парсинга строки формата
+// Инициализация структуры Format значениями по умолчанию
+static inline void init_format(Format *format) {
+  format->flags.minus = false;
+  format->flags.plus = false;
+  format->flags.space = false;
+  format->flags.zero = false;
+
+  format->width.number = 0;
+  format->precision.number = 0;
+  format->precision.explicit = false;
+
+  format->length.h = false;
+  format->length.l = false;
+
+  format->spec.c = false;
+  format->spec.d = false;
+  format->spec.f = false;
+  format->spec.s = false;
+  format->spec.u = false;
+  format->spec.percent = false;
+}
+
+// Основная функция форматированного вывода
 int s21_sprintf(char *str, const char *format, ...);
+
 // Функция парсинга строки формата
 const char *parse_format(const char *fmt, Format *format);
-// Инициализация структуры Format значениями по умолчанию
-void init_format(Format *format);
-// Функция обработки аргументов согласно формату
-const char process_format(Format *format, va_list args, char **buffert);
 
-#endif
+// Функция обработки аргументов согласно формату
+void process_format(Format *format, va_list args, char **buffer);
+
+// Вспомогательная функция для преобразования числа в строку
+void int_to_str(long num, char *str);
+
+// Вспомогательная функция для преобразования unsigned числа в строку
+void uint_to_str(unsigned long num, char *str);
+
+// Вспомогательная функция для преобразования double в строку
+void double_to_str(double num, int precision, char *str);
+
+#endif  // S21_SPRINTF_H
