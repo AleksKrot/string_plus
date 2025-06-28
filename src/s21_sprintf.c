@@ -10,6 +10,18 @@
 
 #include "s21_string.h"
 
+// Объявления вспомогательных функций
+static void process_char(Format *format, va_list args, char **buffer);
+static void process_int(Format *format, va_list args, char **buffer);
+static void process_float(Format *format, va_list args, char **buffer);
+static void process_string(Format *format, va_list args, char **buffer);
+static void process_unsigned(Format *format, va_list args, char **buffer);
+static void process_percent(Format *format, char **buffer);
+static void apply_width_and_padding(Format *format, char *str, int len,
+                                    char **buffer);
+static void apply_precision(Format *format, char *str, int *len);
+
+// Главная функция
 int s21_sprintf(char *str, const char *format, ...) {
   va_list args;
   va_start(args, format);
@@ -40,6 +52,7 @@ int s21_sprintf(char *str, const char *format, ...) {
   return str - start;
 }
 
+// Парсер - выполняет разбор строки формата
 const char *parse_format(const char *fmt, Format *format) {
   const char *p = fmt;
   const char *start = p;  // Сохраняем начальную позицию
@@ -117,251 +130,197 @@ const char *parse_format(const char *fmt, Format *format) {
   return p + 1;
 }
 
+// Основной обработчик форматированных спецификаторов
 void process_format(Format *format, va_list args, char **buffer) {
-  char temp[256];
-  char *ptr = temp;
-  char num_str[64];
-  int len = 0;
-
   if (format->spec.c) {
-    // Обработка %c
-    char c = (char)va_arg(args, int);
-    int width = format->width.number > 0 ? format->width.number : 1;
-
-    if (format->flags.minus) {
-      *ptr++ = c;
-      for (int i = 1; i < width; i++) {
-        *ptr++ = ' ';
-      }
-    } else {
-      // Выравнивание вправо: пробелы + символ
-      for (int i = 1; i < width; i++) {
-        *ptr++ = ' ';
-      }
-      *ptr++ = c;
-    }
+    process_char(format, args, buffer);
   } else if (format->spec.d) {
-    // Обработка %d
-    long num = format->length.l ? va_arg(args, long) : va_arg(args, int);
-    if (format->length.h) num = (short)num;
-
-    int_to_str(labs(num), num_str);
-    len = s21_strlen(num_str);
-
-    // Обработка знака
-    if (num < 0) {
-      s21_memmove(num_str + 1, num_str, len + 1);
-      num_str[0] = '-';
-      len++;
-    } else if (format->flags.plus) {
-      s21_memmove(num_str + 1, num_str, len + 1);
-      num_str[0] = '+';
-      len++;
-    } else if (format->flags.space) {
-      s21_memmove(num_str + 1, num_str, len + 1);
-      num_str[0] = ' ';
-      len++;
-    }
-
-    // Обработка точности
-    if (format->precision.explicit) {
-      int precision = format->precision.number;
-      if (precision > len) {
-        int padding = precision - (num_str[0] == '-' || num_str[0] == '+' ||
-                                           num_str[0] == ' '
-                                       ? len - 1
-                                       : len);
-        if (padding > 0) {
-          char *start = num_str;
-          if (num_str[0] == '-' || num_str[0] == '+' || num_str[0] == ' ') {
-            start++;
-          }
-          s21_memmove(start + padding, start, len + 1);
-          s21_memset(start, '0', padding);
-          len += padding;
-        }
-      }
-    }
-
-    // Обработка ширины
-    if (format->width.number > len) {
-      int padding = format->width.number - len;
-      if (format->flags.minus) {
-        // Выравнивание влево
-        s21_strcpy(ptr, num_str);
-        ptr += len;
-        s21_memset(ptr, ' ', padding);
-        ptr += padding;
-      } else if (format->flags.zero && !format->precision.explicit) {
-        // Нулевое заполнение
-        if (num_str[0] == '-' || num_str[0] == '+' || num_str[0] == ' ') {
-          *ptr++ = num_str[0];
-          s21_memset(ptr, '0', padding);
-          ptr += padding;
-          s21_strcpy(ptr, num_str + 1);
-          ptr += len - 1;
-        } else {
-          s21_memset(ptr, '0', padding);
-          ptr += padding;
-          s21_strcpy(ptr, num_str);
-          ptr += len;
-        }
-      } else {
-        // Выравнивание вправо
-        s21_memset(ptr, ' ', padding);
-        ptr += padding;
-        s21_strcpy(ptr, num_str);
-        ptr += len;
-      }
-    } else {
-      s21_strcpy(ptr, num_str);
-      ptr += len;
-    }
+    process_int(format, args, buffer);
   } else if (format->spec.f) {
-    // Обработка %f
-    double num = va_arg(args, double);
-    int precision = format->precision.explicit ? format->precision.number : 6;
-
-    double_to_str(num, precision, num_str);
-    len = s21_strlen(num_str);
-
-    // Обработка ширины
-    if (format->width.number > len) {
-      int padding = format->width.number - len;
-      if (format->flags.minus) {
-        // Выравнивание влево
-        s21_strcpy(ptr, num_str);
-        ptr += len;
-        s21_memset(ptr, ' ', padding);
-        ptr += padding;
-      } else if (format->flags.zero && !format->precision.explicit) {
-        // Нулевое заполнение
-        if (num_str[0] == '-' || num_str[0] == '+' || num_str[0] == ' ') {
-          *ptr++ = num_str[0];
-          s21_memset(ptr, '0', padding);
-          ptr += padding;
-          s21_strcpy(ptr, num_str + 1);
-          ptr += len - 1;
-        } else {
-          s21_memset(ptr, '0', padding);
-          ptr += padding;
-          s21_strcpy(ptr, num_str);
-          ptr += len;
-        }
-      } else {
-        // Выравнивание вправо
-        s21_memset(ptr, ' ', padding);
-        ptr += padding;
-        s21_strcpy(ptr, num_str);
-        ptr += len;
-      }
-    } else {
-      s21_strcpy(ptr, num_str);
-      ptr += len;
-    }
+    process_float(format, args, buffer);
   } else if (format->spec.s) {
-    // Обработка %s
-    char *s = va_arg(args, char *);
-    if (s == NULL) {
-      s = "(null)";
-    }
-
-    int str_len = s21_strlen(s);
-    int precision_len =
-        format->precision.explicit
-            ? (format->precision.number < str_len ? format->precision.number
-                                                  : str_len)
-            : str_len;
-
-    // Обработка ширины
-    if (format->width.number > precision_len) {
-      int padding = format->width.number - precision_len;
-      if (format->flags.minus) {
-        // Выравнивание влево
-        s21_strncpy(ptr, s, precision_len);
-        ptr += precision_len;
-        s21_memset(ptr, ' ', padding);
-        ptr += padding;
-      } else {
-        // Выравнивание вправо
-        s21_memset(ptr, format->flags.zero ? '0' : ' ', padding);
-        ptr += padding;
-        s21_strncpy(ptr, s, precision_len);
-        ptr += precision_len;
-      }
-    } else {
-      s21_strncpy(ptr, s, precision_len);
-      ptr += precision_len;
-    }
+    process_string(format, args, buffer);
   } else if (format->spec.u) {
-    // Обработка %u
-    unsigned long num = format->length.l ? va_arg(args, unsigned long)
-                                         : va_arg(args, unsigned int);
-    if (format->length.h) num = (unsigned short)num;
-
-    uint_to_str(num, num_str);
-    len = s21_strlen(num_str);
-
-    // Обработка точности
-    if (format->precision.explicit) {
-      int precision = format->precision.number;
-      if (precision > len) {
-        int padding = precision - len;
-        s21_memmove(num_str + padding, num_str, len + 1);
-        s21_memset(num_str, '0', padding);
-        len = precision;
-      }
-    }
-
-    // Обработка ширины
-    if (format->width.number > len) {
-      int padding = format->width.number - len;
-      if (format->flags.minus) {
-        // Выравнивание влево
-        s21_strcpy(ptr, num_str);
-        ptr += len;
-        s21_memset(ptr, ' ', padding);
-        ptr += padding;
-      } else if (format->flags.zero && !format->precision.explicit) {
-        // Нулевое заполнение
-        s21_memmove(num_str + padding, num_str, len + 1);
-        s21_memset(num_str, '0', padding);
-        s21_strcpy(ptr, num_str);
-        ptr += format->width.number;
-      } else {
-        // Выравнивание вправо
-        s21_memset(ptr, ' ', padding);
-        ptr += padding;
-        s21_strcpy(ptr, num_str);
-        ptr += len;
-      }
-    } else {
-      s21_strcpy(ptr, num_str);
-      ptr += len;
-    }
+    process_unsigned(format, args, buffer);
   } else if (format->spec.percent) {
-    // Обработка %%
-    int width = format->width.number > 0 ? format->width.number : 1;
+    process_percent(format, buffer);
+  }
+}
 
-    if (format->flags.minus) {
-      // Выравнивание влево: % + пробелы
-      *ptr++ = '%';
-      for (int i = 1; i < width; i++) {
-        *ptr++ = ' ';
-      }
-    } else {
-      // Выравнивание вправо: пробелы + %
-      for (int i = 1; i < width; i++) {
-        *ptr++ = ' ';
-      }
-      *ptr++ = '%';
-    }
+// Обработка спецификатора %c
+static void process_char(Format *format, va_list args, char **buffer) {
+  char temp[2] = {0};
+  temp[0] = (char)va_arg(args, int);
+  apply_width_and_padding(format, temp, 1, buffer);
+}
+
+// Обработка спецификатора %d
+static void process_int(Format *format, va_list args, char **buffer) {
+  char num_str[64];
+  long num = format->length.l ? va_arg(args, long) : va_arg(args, int);
+  if (format->length.h) num = (short)num;
+
+  int_to_str(labs(num), num_str);
+  int len = s21_strlen(num_str);
+
+  // Добавление знака
+  if (num < 0) {
+    s21_memmove(num_str + 1, num_str, len + 1);
+    num_str[0] = '-';
+    len++;
+  } else if (format->flags.plus) {
+    s21_memmove(num_str + 1, num_str, len + 1);
+    num_str[0] = '+';
+    len++;
+  } else if (format->flags.space) {
+    s21_memmove(num_str + 1, num_str, len + 1);
+    num_str[0] = ' ';
+    len++;
   }
 
-  // Копирование в выходной буфер
-  int total = ptr - temp;
-  s21_memcpy(*buffer, temp, total);
-  *buffer += total;
+  apply_precision(format, num_str, &len);
+  apply_width_and_padding(format, num_str, len, buffer);
+}
+
+// Обработка спецификатора %f
+static void process_float(Format *format, va_list args, char **buffer) {
+  char num_str[64];
+  double num = va_arg(args, double);
+  int precision = format->precision.explicit ? format->precision.number : 6;
+
+  double_to_str(num, precision, num_str);
+  int len = s21_strlen(num_str);
+
+  // Обработка знака
+  char sign = 0;
+  if (num < 0) {
+    sign = '-';
+    num = -num;  // Убираем минус для дальнейшей обработки
+  } else if (format->flags.plus) {
+    sign = '+';
+  } else if (format->flags.space) {
+    sign = ' ';
+  }
+
+  // Создаем временный буфер с учетом знака
+  char temp[64];
+  char *ptr = temp;
+
+  if (sign) {
+    *ptr++ = sign;
+  }
+
+  s21_strcpy(ptr, num_str);
+  len = s21_strlen(temp);
+
+  // Применяем ширину и заполнение
+  apply_width_and_padding(format, temp, len, buffer);
+}
+
+// Обработка спецификатора %s
+static void process_string(Format *format, va_list args, char **buffer) {
+  char *s = va_arg(args, char *);
+  if (s == NULL) s = "(null)";
+
+  int str_len = s21_strlen(s);
+  int precision_len =
+      format->precision.explicit
+          ? (format->precision.number < str_len ? format->precision.number
+                                                : str_len)
+          : str_len;
+
+  char temp[256];
+  s21_strncpy(temp, s, precision_len);
+  temp[precision_len] = '\0';
+
+  apply_width_and_padding(format, temp, precision_len, buffer);
+}
+
+// Обработка спецификатора %u
+static void process_unsigned(Format *format, va_list args, char **buffer) {
+  char num_str[64];
+  unsigned long num = format->length.l ? va_arg(args, unsigned long)
+                                       : va_arg(args, unsigned int);
+  if (format->length.h) num = (unsigned short)num;
+
+  uint_to_str(num, num_str);
+  int len = s21_strlen(num_str);
+
+  apply_precision(format, num_str, &len);
+  apply_width_and_padding(format, num_str, len, buffer);
+}
+
+// Обработка спецификатора %%
+static void process_percent(Format *format, char **buffer) {
+  char temp[2] = {'%', '\0'};
+  apply_width_and_padding(format, temp, 1, buffer);
+}
+
+// Применение точности к числу
+static void apply_precision(Format *format, char *str, int *len) {
+  if (!format->precision.explicit) return;
+
+  int precision = format->precision.number;
+  if (precision > *len) {
+    int padding = precision - (*len);
+    char *start = str;
+
+    // Пропускаем знак если есть
+    if (str[0] == '-' || str[0] == '+' || str[0] == ' ') {
+      start++;
+    }
+
+    s21_memmove(start + padding, start, *len + 1);
+    s21_memset(start, '0', padding);
+    *len += padding;
+  }
+}
+
+// Применение ширины и заполнения
+static void apply_width_and_padding(Format *format, char *str, int len,
+                                    char **buffer) {
+  char temp[256];
+  char *ptr = temp;
+  int padding = format->width.number > len ? format->width.number - len : 0;
+
+  if (padding > 0) {
+    if (format->flags.minus) {
+      // Выравнивание влево: содержимое + пробелы
+      s21_strcpy(ptr, str);
+      ptr += len;
+      s21_memset(ptr, ' ', padding);
+      ptr += padding;
+    } else {
+      if (format->flags.zero && !format->precision.explicit) {
+        // Особый случай для флага 0
+        if (str[0] == '-' || str[0] == '+' || str[0] == ' ') {
+          *ptr++ = str[0];                // Копируем знак
+          s21_memset(ptr, '0', padding);  // Заполняем нулями
+          ptr += padding;
+          s21_strcpy(ptr, str + 1);  // Копируем остаток
+          ptr += len - 1;
+        } else {
+          s21_memset(ptr, '0', padding);
+          ptr += padding;
+          s21_strcpy(ptr, str);
+          ptr += len;
+        }
+      } else {
+        // Обычное выравнивание вправо
+        s21_memset(ptr, ' ', padding);
+        ptr += padding;
+        s21_strcpy(ptr, str);
+        ptr += len;
+      }
+    }
+  } else {
+    // Без заполнения
+    s21_strcpy(ptr, str);
+    ptr += len;
+  }
+
+  s21_memcpy(*buffer, temp, ptr - temp);
+  *buffer += ptr - temp;
 }
 
 // Вспомогательная функция для преобразования числа в строку

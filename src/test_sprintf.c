@@ -248,6 +248,13 @@ void test_flags_combinations() {
   success = strcmp(buffer, expected) == 0;
   print_test_result("%+07.2f", expected, buffer, success);
   assert(success);
+
+  // Дополнительный тест для проверки нулевого заполнения
+  expected = "+0003.140000";
+  s21_sprintf(buffer, "%+010f", 3.14);
+  success = strcmp(buffer, expected) == 0;
+  print_test_result("%+010f", expected, buffer, success);
+  assert(success);
 }
 
 int main() {
